@@ -15,5 +15,6 @@ urlpatterns = [
     path('token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    
+    path('academicintakesession', AcademicIntakeSessionList.as_view()),
+    path('academicintakesession/<int:pk>', AcademicIntakeSessionDetail.as_view()),
 ]   

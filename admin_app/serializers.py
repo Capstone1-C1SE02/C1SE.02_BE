@@ -8,3 +8,7 @@ class LoginSerializer(serializers.Serializer):
 class LogoutSerializer(serializers.Serializer):
     pass
 
+class AcademicIntakeSessionSerializer(serializers.Serializer):
+    class Meta:
+        model = academic_intake_session
+        fields = '__all__'

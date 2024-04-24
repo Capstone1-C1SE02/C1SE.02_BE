@@ -48,3 +48,47 @@ class LogoutView(APIView):
             return Response(status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+####### Academic Intake Session API ########
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class AcademicIntakeSessionList(APIView):
+    def get(self, request, format=None):
+        academicIntakeSession = academic_intake_session.objects.all()
+        serializer = AcademicIntakeSessionSerializer(academicIntakeSession, many=True)
+        return Response(serializer.data)
+    def post(self, request, format=None):
+        serializer = AcademicIntakeSessionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"data": serializer.data, "message": "Tạo mới thành công"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class AcademicIntakeSessionDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return academic_intake_session.objects.get(pk=pk)
+        except academic_intake_session.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        academicIntakeSession = self.get_object(pk)
+        serializer = AcademicIntakeSessionSerializer(academicIntakeSession)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        academicIntakeSession = self.get_object(pk)
+        serializer = AcademicIntakeSessionSerializer(academicIntakeSession, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        academicIntakeSession = self.get_object(pk)
+        academicIntakeSession.delete()
+        return Response({"message": "Xóa thành công"}, status=status.HTTP_204_NO_CONTENT)
