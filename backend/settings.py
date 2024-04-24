@@ -58,7 +58,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
-AUTH_USER_MODEL = 'admin_app.account'
 
 TEMPLATES = [
     {
