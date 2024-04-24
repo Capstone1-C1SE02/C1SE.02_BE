@@ -80,6 +80,9 @@ class account(AbstractUser):
     ACCOUNT_ID = models.AutoField(primary_key=True)
     MIDDLE_NAME = models.CharField(max_length=20,null= False)
 
+    def id(self):
+        return self.ACCOUNT_ID
+
 class diploma_management_profile(models.Model):
     DIPLOMA_MANAGEMENT_PROFILE_ID = models.AutoField(primary_key=True)
     STUDENT_ID_NUMBER = models.ForeignKey(student, on_delete = models.CASCADE, to_field = 'STUDENT_ID_NUMBER')
