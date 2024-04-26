@@ -58,7 +58,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
-AUTH_USER_MODEL = 'admin_app.account'
 
 TEMPLATES = [
     {
@@ -85,9 +84,9 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'capstone1db',
+        'NAME': 'capstone1',
         'USER' : 'root',
-        'PASSWORD' :'12345678',
+        'PASSWORD' :'123456',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -144,7 +143,10 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.MultiPartRenderer',
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.TemplateHTMLRenderer'
-    ]
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
 }
 
 SIMPLE_JWT = {

@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
 
 class academic_intake_session(models.Model):
     ACADEMIC_INTAKE_SESSION_ID = models.AutoField(primary_key=True)
@@ -76,10 +76,6 @@ class student_academic_intake_session_academic_program(models.Model):
         ]
 
 
-class account(AbstractUser):
-    ACCOUNT_ID = models.AutoField(primary_key=True)
-    MIDDLE_NAME = models.CharField(max_length=20,null= False)
-
 class diploma_management_profile(models.Model):
     DIPLOMA_MANAGEMENT_PROFILE_ID = models.AutoField(primary_key=True)
     STUDENT_ID_NUMBER = models.ForeignKey(student, on_delete = models.CASCADE, to_field = 'STUDENT_ID_NUMBER')
@@ -92,6 +88,6 @@ class diploma_management_profile(models.Model):
     DATE_OF_DECISION_ANNOUNCEMENT = models.DateField(null= False)
     COMMENT = models.CharField(max_length=255,null= False)
     DATE_UPDATED = models.DateField(null= False)
-    ACCOUNT_ID = models.ForeignKey(account, on_delete = models.CASCADE, to_field = 'ACCOUNT_ID')
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
 
    
