@@ -38,5 +38,7 @@ urlpatterns = [
     path('student', StudentList.as_view()),
     path('student/<int:pk>', StudentDetail.as_view()),
 
-
+    ### Degree URLs##############
+    path('degree', DegreeList.as_view()),
+    path('degree/<int:pk>', DegreeDetail.as_view()),
 ]   

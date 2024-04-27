@@ -23,25 +23,56 @@ class LearningStatusTypeSerializer(serializers.ModelSerializer):
         fields = '__all__'       
 
 
-########  Serializers ########
+########  Academic Intake Session Serializers ########
 class AcademicIntakeSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = academic_intake_session
         fields = '__all__'
 
 
-class CurriculumSerializer(serializers.ModelSerializer):
+################# Degree Serializers ################
+class DegreeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = degree
+        fields = '__all__'
+
+
+################# Academic Program Serializers ################
+class GetAcademicProgramSerializer(serializers.ModelSerializer):
+    academicleveltype = AcademicLevelTypeSerializer(source='ACADEMIC_LEVEL_TYPE_ID', many=False)
+    degree_item = DegreeSerializer(source='DEGREE_ID', many=False)
+    class Meta:
+        model = academic_program
+        fields = '__all__'
+
+class PostAcademicProgramSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = academic_program
+        fields = '__all__'
+
+########  Curriculum Serializer ########
+
+class GetCurriculumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = curriculum
+        fields = '__all__'
+
+class PostCurriculumSerializer(serializers.ModelSerializer):
+    academicProgram = PostAcademicProgramSerializer(source='ACADEMIC_PROGRAM_ID', many=False)
     class Meta:
         model = curriculum
         fields = '__all__'
 
 
-
 ##### Student Serializers #######
-class StudentSerializer(serializers.ModelSerializer):
+class GetStudentSerializer(serializers.ModelSerializer):
     academicleveltype = AcademicLevelTypeSerializer(source='ACADEMIC_LEVEL_TYPE_ID', many=False)
     learningstatustype = LearningStatusTypeSerializer(source='LEARNING_STATUS_TYPE_ID', many=False)
 
     class Meta:
         model = student
         fields = '__all__'
+
+class PostStudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = student
