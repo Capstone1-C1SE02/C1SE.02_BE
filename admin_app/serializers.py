@@ -76,3 +76,62 @@ class GetStudentSerializer(serializers.ModelSerializer):
 class PostStudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = student
+        fields = '__all__'
+
+
+
+####### AcademicIntakeSession_AcademicProgram_Curriculum_Serializers #######
+class  AcademicIntakeSession_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = academic_intake_session
+        fields = ["ACADEMIC_INTAKE_SESSION_ID","ACADEMIC_INTAKE_SESSION_NAME"]
+
+class AcademicProgram_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = academic_program
+        fields = ["ACADEMIC_PROGRAM_ID","ACADEMIC_PROGRAM_NAME"]
+
+class Curriculum_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = curriculum
+        fields = ["CURRICULUM_ID","CURRICULUM_NAME"]
+
+class Get_AcademicIntakeSession_AcademicProgram_Curriculum_Serializers(serializers.ModelSerializer):
+    academic_intake_session = AcademicIntakeSession_Serializer(source='ACADEMIC_INTAKE_SESSION_ID', many=False)
+    academic_program = AcademicProgram_Serializer(source='ACADEMIC_PROGRAM_ID', many=False)
+    curriculum = Curriculum_Serializer(source='CURRICULUM_ID', many=False)
+    class Meta:
+        model = academic_intake_session_academic_program_curriculum
+        fields = '__all__'
+
+class Post_AcademicIntakeSession_AcademicProgram_Curriculum_Serializers(serializers.ModelSerializer):
+    class Meta:
+        model = academic_intake_session_academic_program_curriculum
+        fields = '__all__'
+
+###### Student_AcademicIntakeSession_AcademicProgramSerializers #######
+
+class Student_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = student
+        fields = ["STUDENT_ID_NUMBER"]
+
+class Get_Student_AcademicIntakeSession_AcademicProgram_Serializers(serializers.ModelSerializer):
+    student = Student_Serializer(source='STUDENT_ID_NUMBER', many=False)
+    academic_intake_session = AcademicIntakeSession_Serializer(source='ACADEMIC_INTAKE_SESSION_ID', many=False)
+    academic_program = AcademicProgram_Serializer(source='ACADEMIC_PROGRAM_ID', many=False)
+    class Meta:
+        model = student_academic_intake_session_academic_program
+        fields = '__all__'
+
+class Post_Student_AcademicIntakeSession_AcademicProgram_Serializers(serializers.ModelSerializer):
+    class Meta:
+        model = student_academic_intake_session_academic_program
+        fields = '__all__'
+
+
+##### DiplomaManagementProfileSerializers #######
+class DiplomaManagementProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = diploma_management_profile
+        fields = '__all__'

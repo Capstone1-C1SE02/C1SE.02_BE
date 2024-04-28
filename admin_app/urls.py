@@ -41,4 +41,12 @@ urlpatterns = [
     ### Degree URLs##############
     path('degree', DegreeList.as_view()),
     path('degree/<int:pk>', DegreeDetail.as_view()),
+
+    ### Academic Intake Session Academic Program Curriculum URLs##############
+    path('academicintakesessionacademicprogramcurriculum', AcademicIntakeSession_AcademicProgram_Curriculum_List.as_view()),
+    path('academicintakesessionacademicprogramcurriculum/<int:pk>', AcademicIntakeSession_AcademicProgram_Curriculum_Detail.as_view()),
+
+    ### Student Academic Intake Session Academic Program URLs##############
+    path('studentacademicintakesessionacademicprogram', Student_AcademicIntakeSession_AcademicProgram_List.as_view()),
+    path('studentacademicintakesessionacademicprogram/<int:pk>', Student_AcademicIntakeSession_AcademicProgram_Detail.as_view()),
 ]   
