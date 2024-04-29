@@ -125,13 +125,19 @@ class Get_Student_AcademicIntakeSession_AcademicProgram_Serializers(serializers.
         fields = '__all__'
 
 class Post_Student_AcademicIntakeSession_AcademicProgram_Serializers(serializers.ModelSerializer):
+    academic_program = AcademicProgram_Serializer(source='ACADEMIC_PROGRAM_ID', many=False)
     class Meta:
         model = student_academic_intake_session_academic_program
         fields = '__all__'
 
 
 ##### DiplomaManagementProfileSerializers #######
-class DiplomaManagementProfileSerializer(serializers.ModelSerializer):
+class GetDiplomaManagementProfileSerializer(serializers.ModelSerializer):
+    academicProgram = AcademicProgram_Serializer(source='ACADEMIC_PROGRAM_ID', many=False)
+    class Meta:
+        model = diploma_management_profile
+        fields = '__all__'
+class PostDiplomaManagementProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = diploma_management_profile
         fields = '__all__'

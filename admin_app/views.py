@@ -492,3 +492,50 @@ class Student_AcademicIntakeSession_AcademicProgram_Detail(APIView):
         student_AcademicIntakeSession_AcademicProgram_temp = self.get_object(pk)
         student_AcademicIntakeSession_AcademicProgram_temp.delete()
         return Response({"message": "Xóa thành công"}, status=status.HTTP_204_NO_CONTENT)
+    
+######### Diploma Management Profile API ###########
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class DiplomaManagementProfileList(APIView):
+    pagination_class = MyPagination
+    def get(self, request, format=None):
+        diplomaManagementProfile = diploma_management_profile.objects.all()
+        paginator = self.pagination_class()
+        curriculum_page = paginator.paginate_queryset(diplomaManagementProfile, request)
+        serializer = GetDiplomaManagementProfileSerializer(curriculum_page, many=True)
+        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
+    def post(self, request, format=None):
+        serializer = PostDiplomaManagementProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            if student.objects.filter(STUDENT_ID_NUMBER=request.data['STUDENT_ID_NUMBER']).exists():
+                student = student.objects.get(STUDENT_ID_NUMBER=request.data['STUDENT_ID_NUMBER'])
+                serializer.save()
+                return Response({"data": serializer.data, "message": "Tạo mới thành công","errCode":"0"}, status=status.HTTP_201_CREATED)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
+
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class DiplomaManagementProfileDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return diploma_management_profile.objects.get(pk=pk)
+        except diploma_management_profile.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        diplomaManagementProfile = self.get_object(pk)
+        serializer = GetDiplomaManagementProfileSerializer(diplomaManagementProfile)
+        return Response({"data":serializer.data, "errCode":"0"},status=status.HTTP_200_OK)
+
+    def put(self, request, pk, format=None):
+        diplomaManagementProfile = self.get_object(pk)
+        serializer = PostDiplomaManagementProfileSerializer(diplomaManagementProfile, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"data": serializer.data,"errCode":"0", "message": "Chỉnh sửa thành công"},status=status.HTTP_200_OK)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        diplomaManagementProfile = self.get_object(pk)
+        diplomaManagementProfile.delete()
+        return Response({"message": "Xóa thành công","errCode":"0"}, status=status.HTTP_204_NO_CONTENT)
