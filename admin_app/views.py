@@ -179,13 +179,13 @@ class AcademicIntakeSessionList(APIView):
         paginator = self.pagination_class()  # Khởi tạo paginator
         result_page = paginator.paginate_queryset(academicIntakeSession, request)
         serializer = AcademicIntakeSessionSerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
     def post(self, request, format=None):
         serializer = AcademicIntakeSessionSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"data": serializer.data, "message": "Tạo mới thành công"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"data": serializer.data, "message": "Tạo mới thành công","errCode":"0"}, status=status.HTTP_201_CREATED)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -199,20 +199,20 @@ class AcademicIntakeSessionDetail(APIView):
     def get(self, request, pk, format=None):
         academicIntakeSession = self.get_object(pk)
         serializer = AcademicIntakeSessionSerializer(academicIntakeSession)
-        return Response(serializer.data)
+        return Response({"data":serializer.data, "errCode":"0"},status=status.HTTP_200_OK)
 
     def put(self, request, pk, format=None):
         academicIntakeSession = self.get_object(pk)
         serializer = AcademicIntakeSessionSerializer(academicIntakeSession, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"data": serializer.data,"errCode":"0", "message": "Chỉnh sửa thành công"},status=status.HTTP_200_OK)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
         academicIntakeSession = self.get_object(pk)
         academicIntakeSession.delete()
-        return Response({"message": "Xóa thành công"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "Xóa thành công","errCode":"0"}, status=status.HTTP_204_NO_CONTENT)
     
 
 
@@ -226,13 +226,13 @@ class CurriculumList(APIView):
         paginator = self.pagination_class()  # Khởi tạo paginator
         curriculum_page = paginator.paginate_queryset(curriculum_temp, request)
         serializer = GetCurriculumSerializer(curriculum_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
     def post(self, request, format=None):
         serializer = PostCurriculumSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"data": serializer.data, "message": "Tạo mới thành công"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"data": serializer.data, "message": "Tạo mới thành công","errCode":"0"}, status=status.HTTP_201_CREATED)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -246,20 +246,20 @@ class CurriculumDetail(APIView):
     def get(self, request, pk, format=None):
         curriculum_temp = self.get_object(pk)
         serializer = GetCurriculumSerializer(curriculum_temp)
-        return Response(serializer.data)
+        return Response({"data":serializer.data, "errCode":"0"},status=status.HTTP_200_OK)
 
     def put(self, request, pk, format=None):
         curriculum_temp = self.get_object(pk)
         serializer = PostCurriculumSerializer(curriculum_temp, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"data": serializer.data,"errCode":"0", "message": "Chỉnh sửa thành công"},status=status.HTTP_200_OK)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
         curriculum_temp = self.get_object(pk)
         curriculum_temp.delete()
-        return Response({"message": "Xóa thành công"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "Xóa thành công","errCode":"0"}, status=status.HTTP_204_NO_CONTENT)
     
 
 
@@ -273,13 +273,13 @@ class StudentList(APIView):
         paginator = self.pagination_class()  # Khởi tạo paginator
         curriculum_page = paginator.paginate_queryset(student_list, request)
         serializer = GetStudentSerializer(curriculum_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
     def post(self, request, format=None):
         serializer = PostStudentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"data": serializer.data, "message": "Tạo mới thành công"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"data": serializer.data, "message": "Tạo mới thành công","errCode":"0"}, status=status.HTTP_201_CREATED)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -293,20 +293,20 @@ class StudentDetail(APIView):
     def get(self, request, pk, format=None):
         student_temp = self.get_object(pk)
         serializer = GetStudentSerializer(student_temp)
-        return Response(serializer.data)
+        return Response({"data":serializer.data, "errCode":"0"},status=status.HTTP_200_OK)
 
     def put(self, request, pk, format=None):
         student_temp = self.get_object(pk)
         serializer = PostStudentSerializer(student_temp, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"data": serializer.data,"errCode":"0", "message": "Chỉnh sửa thành công"},status=status.HTTP_200_OK)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
         student_temp = self.get_object(pk)
         student_temp.delete()
-        return Response({"message": "Xóa thành công"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "Xóa thành công","errCode":"0"}, status=status.HTTP_204_NO_CONTENT)
     
 
 
@@ -320,13 +320,13 @@ class DegreeList(APIView):
         paginator = self.pagination_class()  # Khởi tạo paginator
         curriculum_page = paginator.paginate_queryset(degree_list, request)
         serializer = DegreeSerializer(curriculum_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
     def post(self, request, format=None):
         serializer = DegreeSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"data": serializer.data, "message": "Tạo mới thành công"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"data": serializer.data, "message": "Tạo mới thành công","errCode":"0"}, status=status.HTTP_201_CREATED)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -340,20 +340,20 @@ class DegreeDetail(APIView):
     def get(self, request, pk, format=None):
         degree_temp = self.get_object(pk)
         serializer = DegreeSerializer(degree_temp)
-        return Response(serializer.data)
+        return Response({"data":serializer.data, "errCode":"0"},status=status.HTTP_200_OK)
 
     def put(self, request, pk, format=None):
         degree_temp = self.get_object(pk)
         serializer = DegreeSerializer(degree_temp, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"data": serializer.data,"errCode":"0", "message": "Chỉnh sửa thành công"},status=status.HTTP_200_OK)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
         degree_temp = self.get_object(pk)
         degree_temp.delete()
-        return Response({"message": "Xóa thành công"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "Xóa thành công","errCode":"0"}, status=status.HTTP_204_NO_CONTENT)
     
 
 
@@ -367,13 +367,13 @@ class AcademicProgramList(APIView):
         paginator = self.pagination_class()
         curriculum_page = paginator.paginate_queryset(academic_program_list, request)
         serializer = GetAcademicProgramSerializer(curriculum_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
     def post(self, request, format=None):
         serializer = PostAcademicProgramSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"data": serializer.data, "message": "Tạo mới thành công"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"data": serializer.data, "message": "Tạo mới thành công","errCode":"0"}, status=status.HTTP_201_CREATED)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -387,17 +387,155 @@ class AcademicProgramDetail(APIView):
     def get(self, request, pk, format=None):
         academic_program_temp = self.get_object(pk)
         serializer = GetAcademicProgramSerializer(academic_program_temp)
-        return Response(serializer.data)
+        return Response({"data":serializer.data, "errCode":"0"},status=status.HTTP_200_OK)
 
     def put(self, request, pk, format=None):
         academic_program_temp = self.get_object(pk)
         serializer = PostAcademicProgramSerializer(academic_program_temp, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"data": serializer.data,"errCode":"0", "message": "Chỉnh sửa thành công"},status=status.HTTP_200_OK)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
         academic_program_temp = self.get_object(pk)
         academic_program_temp.delete()
+        return Response({"message": "Xóa thành công","errCode":"0"}, status=status.HTTP_204_NO_CONTENT)
+    
+
+###### AcademicIntakeSession AcademicProgram Curriculum API ######
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class AcademicIntakeSession_AcademicProgram_Curriculum_List(APIView):
+    pagination_class = MyPagination
+    def get(self, request, format=None):
+        academicIntakeSession_AcademicProgram_Curriculum_list = academic_intake_session_academic_program_curriculum.objects.all()
+        paginator = self.pagination_class()
+        curriculum_page = paginator.paginate_queryset(academicIntakeSession_AcademicProgram_Curriculum_list, request)
+        serializer = Get_AcademicIntakeSession_AcademicProgram_Curriculum_Serializers(curriculum_page, many=True)
+        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
+    def post(self, request, format=None):
+        serializer = Post_AcademicIntakeSession_AcademicProgram_Curriculum_Serializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"data": serializer.data, "message": "Tạo mới thành công","errCode":"0"}, status=status.HTTP_201_CREATED)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
+
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class AcademicIntakeSession_AcademicProgram_Curriculum_Detail(APIView):
+    def get_object(self, pk):
+        try:
+            return academic_intake_session_academic_program_curriculum.objects.get(pk=pk)
+        except academic_intake_session_academic_program_curriculum.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        academicIntakeSession_AcademicProgram_Curriculum_temp = self.get_object(pk)
+        serializer = Get_AcademicIntakeSession_AcademicProgram_Curriculum_Serializers(academicIntakeSession_AcademicProgram_Curriculum_temp)
+        return Response({"data":serializer.data, "errCode":"0"},status=status.HTTP_200_OK)
+
+    def put(self, request, pk, format=None):
+        academicIntakeSession_AcademicProgram_Curriculum_temp = self.get_object(pk)
+        serializer = Post_AcademicIntakeSession_AcademicProgram_Curriculum_Serializers(academicIntakeSession_AcademicProgram_Curriculum_temp, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"data": serializer.data,"errCode":"0", "message": "Chỉnh sửa thành công"},status=status.HTTP_200_OK)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        academicIntakeSession_AcademicProgram_Curriculum_temp = self.get_object(pk)
+        academicIntakeSession_AcademicProgram_Curriculum_temp.delete()
+        return Response({"message": "Xóa thành công","errCode":"0"}, status=status.HTTP_204_NO_CONTENT)
+    
+###### Student AcademicIntakeSession AcademicProgram API ######
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class Student_AcademicIntakeSession_AcademicProgram_List(APIView):
+    pagination_class = MyPagination
+    def get(self, request, format=None):
+        student_AcademicIntakeSession_AcademicProgram_list = student_academic_intake_session_academic_program.objects.all()
+        paginator = self.pagination_class()
+        curriculum_page = paginator.paginate_queryset(student_AcademicIntakeSession_AcademicProgram_list, request)
+        serializer = Get_Student_AcademicIntakeSession_AcademicProgram_Serializers(curriculum_page, many=True)
+        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
+    def post(self, request, format=None):
+        serializer = Post_Student_AcademicIntakeSession_AcademicProgram_Serializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"data": serializer.data, "message": "Tạo mới thành công","errCode":"0"}, status=status.HTTP_201_CREATED)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
+    
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class Student_AcademicIntakeSession_AcademicProgram_Detail(APIView):
+    def get_object(self, pk):
+        try:
+            return student_academic_intake_session_academic_program.objects.get(pk=pk)
+        except student_academic_intake_session_academic_program.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        student_AcademicIntakeSession_AcademicProgram_temp = self.get_object(pk)
+        serializer = Get_Student_AcademicIntakeSession_AcademicProgram_Serializers(student_AcademicIntakeSession_AcademicProgram_temp)
+        return Response({"data":serializer.data, "errCode":"0"},status=status.HTTP_200_OK)
+
+    def put(self, request, pk, format=None):
+        student_AcademicIntakeSession_AcademicProgram_temp = self.get_object(pk)
+        serializer = Post_Student_AcademicIntakeSession_AcademicProgram_Serializers(student_AcademicIntakeSession_AcademicProgram_temp, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"data": serializer.data,"errCode":"0", "message": "Chỉnh sửa thành công"},status=status.HTTP_200_OK)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        student_AcademicIntakeSession_AcademicProgram_temp = self.get_object(pk)
+        student_AcademicIntakeSession_AcademicProgram_temp.delete()
         return Response({"message": "Xóa thành công"}, status=status.HTTP_204_NO_CONTENT)
+    
+######### Diploma Management Profile API ###########
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class DiplomaManagementProfileList(APIView):
+    pagination_class = MyPagination
+    def get(self, request, format=None):
+        diplomaManagementProfile = diploma_management_profile.objects.all()
+        paginator = self.pagination_class()
+        curriculum_page = paginator.paginate_queryset(diplomaManagementProfile, request)
+        serializer = GetDiplomaManagementProfileSerializer(curriculum_page, many=True)
+        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
+    def post(self, request, format=None):
+        serializer = PostDiplomaManagementProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            if student.objects.filter(STUDENT_ID_NUMBER=request.data['STUDENT_ID_NUMBER']).exists():
+                student = student.objects.get(STUDENT_ID_NUMBER=request.data['STUDENT_ID_NUMBER'])
+                serializer.save()
+                return Response({"data": serializer.data, "message": "Tạo mới thành công","errCode":"0"}, status=status.HTTP_201_CREATED)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
+
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class DiplomaManagementProfileDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return diploma_management_profile.objects.get(pk=pk)
+        except diploma_management_profile.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        diplomaManagementProfile = self.get_object(pk)
+        serializer = GetDiplomaManagementProfileSerializer(diplomaManagementProfile)
+        return Response({"data":serializer.data, "errCode":"0"},status=status.HTTP_200_OK)
+
+    def put(self, request, pk, format=None):
+        diplomaManagementProfile = self.get_object(pk)
+        serializer = PostDiplomaManagementProfileSerializer(diplomaManagementProfile, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"data": serializer.data,"errCode":"0", "message": "Chỉnh sửa thành công"},status=status.HTTP_200_OK)
+        return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        diplomaManagementProfile = self.get_object(pk)
+        diplomaManagementProfile.delete()
+        return Response({"message": "Xóa thành công","errCode":"0"}, status=status.HTTP_204_NO_CONTENT)

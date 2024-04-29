@@ -90,7 +90,8 @@ class diploma_management_profile(models.Model):
     NUMBER_ENTERED_INTO_THE_DEGREE_TRACKING_BOOK = models.CharField(max_length=50,null= False)
     DATE_OF_DECISION_ANNOUNCEMENT = models.DateField(null= False)
     COMMENT = models.CharField(max_length=500,null= True, default=None)
-    DATE_UPDATED = models.DateField(null= False)
+    DATE_UPDATED = models.DateField(null= False,auto_now=True)
     user = models.ForeignKey(User, on_delete = models.CASCADE)
+    APPORVEDY = models.BooleanField(default=False)
 
    

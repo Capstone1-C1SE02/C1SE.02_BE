@@ -16,13 +16,11 @@ urlpatterns = [
     path('token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-
     ### Status Type  URLs##############
     path('academicleveltype', AcademicLevelTypeList.as_view()),
     path('academicleveltype/<int:pk>', AcademicIntakeSessionDetail.as_view()),
     path('learningstatustype', LearningStatusTypeList.as_view()),
     path('learningstatustype/<int:pk>', LearningStatusTypeDetail.as_view()),
-
 
     ### Academic Intake Session URLs##############
     path('academicintakesession', AcademicIntakeSessionList.as_view()),
@@ -33,7 +31,6 @@ urlpatterns = [
     path('curriculum', CurriculumList.as_view()),
     path('curriculum/<int:pk>', CurriculumDetail.as_view()),
 
-    
     #### Student URLs##############
     path('student', StudentList.as_view()),
     path('student/<int:pk>', StudentDetail.as_view()),
@@ -41,4 +38,20 @@ urlpatterns = [
     ### Degree URLs##############
     path('degree', DegreeList.as_view()),
     path('degree/<int:pk>', DegreeDetail.as_view()),
+
+    ### Academic Program URLs##############
+    path('academicprogram', AcademicProgramList.as_view()),
+    path('academicprogram/<int:pk>', AcademicProgramDetail.as_view()),
+
+    ### Academic Intake Session Academic Program Curriculum URLs##############
+    path('academicintakesessionacademicprogramcurriculum', AcademicIntakeSession_AcademicProgram_Curriculum_List.as_view()),
+    path('academicintakesessionacademicprogramcurriculum/<int:pk>', AcademicIntakeSession_AcademicProgram_Curriculum_Detail.as_view()),
+
+    ### Student Academic Intake Session Academic Program URLs##############
+    path('studentacademicintakesessionacademicprogram', Student_AcademicIntakeSession_AcademicProgram_List.as_view()),
+    path('studentacademicintakesessionacademicprogram/<int:pk>', Student_AcademicIntakeSession_AcademicProgram_Detail.as_view()),
+
+    ### Diploma Management Profile URLs############## u
+    path('diplomamanagementprofile', DiplomaManagementProfileList.as_view()),
+    path('diplomamanagementprofile/<int:pk>', DiplomaManagementProfileDetail.as_view()),
 ]   
