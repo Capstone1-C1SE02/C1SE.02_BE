@@ -508,7 +508,6 @@ class DiplomaManagementProfileList(APIView):
         serializer = PostDiplomaManagementProfileSerializer(data=request.data)
         if serializer.is_valid():
             if student.objects.filter(STUDENT_ID_NUMBER=request.data['STUDENT_ID_NUMBER']).exists():
-                student = student.objects.get(STUDENT_ID_NUMBER=request.data['STUDENT_ID_NUMBER'])
                 serializer.save()
                 return Response({"data": serializer.data, "message": "Tạo mới thành công","errCode":"0"}, status=status.HTTP_201_CREATED)
         return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)

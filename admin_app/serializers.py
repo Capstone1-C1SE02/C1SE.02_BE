@@ -53,12 +53,12 @@ class PostAcademicProgramSerializer(serializers.ModelSerializer):
 ########  Curriculum Serializer ########
 
 class GetCurriculumSerializer(serializers.ModelSerializer):
+    academicProgram = PostAcademicProgramSerializer(source='ACADEMIC_PROGRAM_ID', many=False)
     class Meta:
         model = curriculum
         fields = '__all__'
 
 class PostCurriculumSerializer(serializers.ModelSerializer):
-    academicProgram = PostAcademicProgramSerializer(source='ACADEMIC_PROGRAM_ID', many=False)
     class Meta:
         model = curriculum
         fields = '__all__'
@@ -68,7 +68,6 @@ class PostCurriculumSerializer(serializers.ModelSerializer):
 class GetStudentSerializer(serializers.ModelSerializer):
     academicleveltype = AcademicLevelTypeSerializer(source='ACADEMIC_LEVEL_TYPE_ID', many=False)
     learningstatustype = LearningStatusTypeSerializer(source='LEARNING_STATUS_TYPE_ID', many=False)
-
     class Meta:
         model = student
         fields = '__all__'
@@ -125,7 +124,6 @@ class Get_Student_AcademicIntakeSession_AcademicProgram_Serializers(serializers.
         fields = '__all__'
 
 class Post_Student_AcademicIntakeSession_AcademicProgram_Serializers(serializers.ModelSerializer):
-    academic_program = AcademicProgram_Serializer(source='ACADEMIC_PROGRAM_ID', many=False)
     class Meta:
         model = student_academic_intake_session_academic_program
         fields = '__all__'
@@ -137,6 +135,7 @@ class GetDiplomaManagementProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = diploma_management_profile
         fields = '__all__'
+        
 class PostDiplomaManagementProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = diploma_management_profile
