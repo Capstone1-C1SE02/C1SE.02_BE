@@ -12,15 +12,22 @@ class AcademicProgram_Serializer(serializers.ModelSerializer):
         model = academic_program
         fields = ["ACADEMIC_PROGRAM_NAME","DEGREE"]
 
+class StudentSerializer(serializers.ModelSerializer):
+    STUDENT_NAME = serializers.SerializerMethodField()
+    class Meta:
+        model = student
+        fields = ["STUDET_NAME"]
+    def get_STUDENT_NAME(self, obj):
+        return f"{obj.LAST_NAME} {obj.MIDDLE_NAME} {obj.FIRST_NAME}"
+    
 class DiplomaManagementProfileSerializer(serializers.ModelSerializer):
     ACADEMIC_PROGRAM = AcademicProgram_Serializer(source='ACADEMIC_PROGRAM_ID', many=False)
-    STUDENT_NAME = serializers.SerializerMethodField()
+    STUDENT = StudentSerializer(source='STUDENT_ID_NUMBER',many=False)
     BIRTH_DATE = serializers.DateField(source='STUDENT_ID_NUMBER.BIRTH_DATE')
     class Meta:
         model = diploma_management_profile
-        exclude  = ["ACADEMIC_PROGRAM_ID","user","LAST_NAME","FIRST_NAME","MIDDLE_NAME","DIPLOMA_MANAGEMENT_PROFILE_ID","COMMENT","DATE_UPDATED","APPORVEDY"]
-    def get_STUDENT_NAME(self, obj):
-        return f"{obj.LAST_NAME} {obj.MIDDLE_NAME} {obj.FIRST_NAME}"
+        exclude  = ["ACADEMIC_PROGRAM_ID","user","DIPLOMA_MANAGEMENT_PROFILE_ID","COMMENT","DATE_UPDATED","APPORVEDY"]
+    
     
 class ImageUploadSerializer(serializers.Serializer):
     image = serializers.ImageField()
