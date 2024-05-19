@@ -52,8 +52,6 @@ class InformationRetrievalthroughTextAPIView(APIView):
             return Response({"Message": "CAPTCHA_RESPONSE is required.","errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
         if not (number_entered_into_the_degree_tracking_book):
             return Response({"Message": "NUMBER_ENTERED_INTO_THE_DEGREE_TRACKING_BOOK is required.","errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
-
-
         try:
             captcha = CaptchaStore.objects.get(hashkey=captcha_key)
             if captcha.response == captcha_response:
@@ -63,17 +61,16 @@ class InformationRetrievalthroughTextAPIView(APIView):
                     last_name, middle_name, first_name  = parts
                 else:
                     return Response({'error': 'Invalid student name format. Please provide full name ',"errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
-                
                 #### Lấy thông tin section
                 try:
                     ## Sử dụng phương thức get() để lấy một đối tượng duy nhất từ cơ sở dữ liệu
                     diplopma_profile = diploma_management_profile.objects.get( 
                                                                     CERTIFICATE_NUMBER=certificate_number,
                                                                     NUMBER_ENTERED_INTO_THE_DEGREE_TRACKING_BOOK = number_entered_into_the_degree_tracking_book)
-                    student_information = student.objects.get(STUDENT_ID_NUMBER=diplopma_profile.STUDENT_ID_NUMBER)
+                    # student_information = student.objects.get(STUDENT_ID_NUMBER=diplopma_profile.STUDENT_ID_NUMBER)
 
-                    if student_information.LAST_NAME != last_name or student_information.FIRST_NAME != first_name or student_information.MIDDLE_NAME != middle_name:
-                        return Response({"message": "Không tìm thấy hồ sơ phù hợp!","errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
+                    # if student_information.LAST_NAME != last_name or student_information.FIRST_NAME != first_name or student_information.MIDDLE_NAME != middle_name:
+                    #     return Response({"message": "Không tìm thấy hồ sơ phù hợp!","errCode":"0"}, status=status.HTTP_200_OK)
                     serializer = DiplomaManagementProfileSerializer(diplopma_profile)
                     return Response({"data": serializer.data, "message": "Tìm kiếm thành công!","errCode":"0"},status=status.HTTP_200_OK)
                 ## Nếu không có đối tượng nào hoặc có nhiều hơn một đối tượng thỏa mãn điều kiện, sẽ ném ra ngoại lệ
@@ -263,7 +260,7 @@ class InformationRetrievalthroughImageAPIView(APIView):
 
             ######### kiểm tra xem có extract được text phù hợp không 
             if student_name is None or certificate_number is None or number_in_degree is None:
-                return Response({"message": "Lỗi: Vui lòng gử lại ảnh gồm toàn bộ hình ảnh của văn bằng và chất lượng tốt hơn!!!!","errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Lỗi: Vui lòng gửi lại ảnh gồm toàn bộ hình ảnh của văn bằng và chất lượng tốt hơn!!!!","errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
             
             ######## tách student name thành first_name, last_name và middle_name
             parts = student_name.split()
@@ -278,9 +275,9 @@ class InformationRetrievalthroughImageAPIView(APIView):
                 diplopma_profile = diploma_management_profile.objects.get( 
                                                                     CERTIFICATE_NUMBER=certificate_number,
                                                                     NUMBER_ENTERED_INTO_THE_DEGREE_TRACKING_BOOK = number_in_degree)
-                student_information = student.objects.get(STUDENT_ID_NUMBER=diplopma_profile.STUDENT_ID_NUMBER)
-                if student_information.LAST_NAME != last_name or student_information.FIRST_NAME != first_name or student_information.MIDDLE_NAME != middle_name:
-                        return Response({"message": "Không tìm thấy hồ sơ phù hợp!","errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
+                # student_information = student.objects.get(STUDENT_ID_NUMBER=diplopma_profile.STUDENT_ID_NUMBER)
+                # if student_information.LAST_NAME != last_name or student_information.FIRST_NAME != first_name or student_information.MIDDLE_NAME != middle_name:
+                #         return Response({"message": "Không tìm thấy hồ sơ phù hợp!","errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
                 response_serializer = DiplomaManagementProfileSerializer(diplopma_profile)
                 return Response({"data": response_serializer.data, "message": "Tìm kiếm thành công","errCode":"0"},status=status.HTTP_200_OK)
             ## Nếu không có đối tượng nào hoặc có nhiều hơn một đối tượng thỏa mãn điều kiện, sẽ ném ra ngoại lệ

@@ -55,7 +55,7 @@ class student(models.Model):
     MIDDLE_NAME = models.CharField(max_length=20,null= False)
     GENDER = models.BooleanField()
     BIRTH_DATE = models.DateField(null=False)
-    BIRTH_PLACE = models.CharField(max_length=100,null=False)
+    BIRTH_PLACE = models.CharField(max_length=255,null=False)
     PEOPLE_ID_NUMBER = models.CharField(max_length=50,null= False)
     NATION = models.CharField(max_length=50,null= False)
     NATIONALITY = models.CharField(max_length=50,null= False)
@@ -89,6 +89,6 @@ class diploma_management_profile(models.Model):
     COMMENT = models.CharField(max_length=500,null= True, default=None)
     DATE_UPDATED = models.DateField(null= False,auto_now=True)
     user = models.OneToOneField(User, on_delete = models.CASCADE)
-    APPORVEDY = models.BooleanField(default=False)
+    APPORVED = models.BooleanField(default=False)
 
    

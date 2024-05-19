@@ -16,7 +16,7 @@ class StudentSerializer(serializers.ModelSerializer):
     STUDENT_NAME = serializers.SerializerMethodField()
     class Meta:
         model = student
-        fields = ["STUDET_NAME"]
+        fields = ["STUDENT_NAME"]
     def get_STUDENT_NAME(self, obj):
         return f"{obj.LAST_NAME} {obj.MIDDLE_NAME} {obj.FIRST_NAME}"
     
@@ -26,7 +26,7 @@ class DiplomaManagementProfileSerializer(serializers.ModelSerializer):
     BIRTH_DATE = serializers.DateField(source='STUDENT_ID_NUMBER.BIRTH_DATE')
     class Meta:
         model = diploma_management_profile
-        exclude  = ["ACADEMIC_PROGRAM_ID","user","DIPLOMA_MANAGEMENT_PROFILE_ID","COMMENT","DATE_UPDATED","APPORVEDY"]
+        exclude  = ["ACADEMIC_PROGRAM_ID","user","DIPLOMA_MANAGEMENT_PROFILE_ID","COMMENT","DATE_UPDATED","APPORVED"]
     
     
 class ImageUploadSerializer(serializers.Serializer):
