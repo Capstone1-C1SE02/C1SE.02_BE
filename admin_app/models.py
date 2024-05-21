@@ -11,7 +11,7 @@ class degree(models.Model):
     DEGREE_NAME = models.CharField(max_length=50,null= False)
     DEGREE_CODE = models.CharField(max_length=20,null= False)
     DEGREE_STATUS = models.BooleanField(null= False)
-    DESCRIPTION = models.CharField(max_length=500,default=None)
+    DESCRIPTION = models.CharField(max_length=500,default=None,null= True)
 
 class academic_level_type(models.Model):
     ACADEMIC_LEVEL_TYPE_ID = models.AutoField(primary_key=True)
