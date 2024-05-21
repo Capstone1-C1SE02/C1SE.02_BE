@@ -32,13 +32,13 @@ class curriculum(models.Model):
     CURRICULUM_NAME = models.CharField(max_length=50,null= False)
     DESCRIPTION = models.CharField(max_length=500,null= True, default=None)
     CURRICULUM_STATUS_NAME = models.BooleanField(default=True)
-    ACADEMIC_PROGRAM_ID = models.OneToOneField(academic_program, on_delete = models.CASCADE, to_field = 'ACADEMIC_PROGRAM_ID')
+    ACADEMIC_PROGRAM_ID = models.ForeignKey(academic_program, on_delete = models.CASCADE, to_field = 'ACADEMIC_PROGRAM_ID')
 
 class academic_intake_session_academic_program_curriculum(models.Model):
-    ACADEMIC_INTAKE_SESSION_ID = models.OneToOneField(academic_intake_session, on_delete = models.CASCADE, to_field = 'ACADEMIC_INTAKE_SESSION_ID')
-    ACADEMIC_PROGRAM_ID = models.OneToOneField(academic_program, on_delete = models.CASCADE, to_field = 'ACADEMIC_PROGRAM_ID')
-    CURRICULUM_ID = models.OneToOneField(curriculum, on_delete = models.CASCADE, to_field = 'CURRICULUM_ID')
-    STATUS_NAME = models.CharField(max_length=50,default = True)
+    ACADEMIC_INTAKE_SESSION_ID = models.ForeignKey(academic_intake_session, on_delete = models.CASCADE, to_field = 'ACADEMIC_INTAKE_SESSION_ID')
+    ACADEMIC_PROGRAM_ID = models.ForeignKey(academic_program, on_delete = models.CASCADE, to_field = 'ACADEMIC_PROGRAM_ID')
+    CURRICULUM_ID = models.ForeignKey(curriculum, on_delete = models.CASCADE, to_field = 'CURRICULUM_ID')
+    STATUS_NAME = models.BooleanField(default=True)
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['ACADEMIC_INTAKE_SESSION_ID', 'ACADEMIC_PROGRAM_ID', 'CURRICULUM_ID'], name='PK_intake_session_program_curriculum')
@@ -66,9 +66,9 @@ class student(models.Model):
     ACADEMIC_LEVEL_TYPE_ID = models.ForeignKey(academic_level_type, on_delete = models.CASCADE, to_field = 'ACADEMIC_LEVEL_TYPE_ID')
 
 class student_academic_intake_session_academic_program(models.Model):
-    STUDENT_ID_NUMBER = models.OneToOneField(student, on_delete = models.CASCADE, to_field = 'STUDENT_ID_NUMBER')
-    ACADEMIC_INTAKE_SESSION_ID = models.OneToOneField(academic_intake_session, on_delete = models.CASCADE, to_field = 'ACADEMIC_INTAKE_SESSION_ID')
-    ACADEMIC_PROGRAM_ID = models.OneToOneField(academic_program, on_delete = models.CASCADE, to_field = 'ACADEMIC_PROGRAM_ID')
+    STUDENT_ID_NUMBER = models.ForeignKey(student, on_delete = models.CASCADE, to_field = 'STUDENT_ID_NUMBER')
+    ACADEMIC_INTAKE_SESSION_ID = models.ForeignKey(academic_intake_session, on_delete = models.CASCADE, to_field = 'ACADEMIC_INTAKE_SESSION_ID')
+    ACADEMIC_PROGRAM_ID = models.ForeignKey(academic_program, on_delete = models.CASCADE, to_field = 'ACADEMIC_PROGRAM_ID')
     LEARNING_STATUS_TYPE_ID = models.ForeignKey(learning_status_type, on_delete = models.CASCADE, to_field = 'LEARNING_STATUS_TYPE_ID')
     class Meta:
         constraints = [
@@ -88,7 +88,7 @@ class diploma_management_profile(models.Model):
     DATE_OF_DECISION_ANNOUNCEMENT = models.DateField(null= False)
     COMMENT = models.CharField(max_length=500,null= True, default=None)
     DATE_UPDATED = models.DateField(null= False,auto_now=True)
-    user = models.OneToOneField(User, on_delete = models.CASCADE)
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
     APPORVED = models.BooleanField(default=False)
 
    

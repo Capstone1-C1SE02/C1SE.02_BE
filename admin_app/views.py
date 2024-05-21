@@ -467,7 +467,6 @@ class SearchAcademicProgram(APIView):
 ######----------------------------------------------------------------------------------------------#####   
 
 
-
 ###### AcademicIntakeSession AcademicProgram Curriculum API ######
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
