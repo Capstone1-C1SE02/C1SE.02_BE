@@ -265,8 +265,8 @@ class StudentList(APIView):
         student_list = student.objects.all()
         if 'page' in request.query_params:
             paginator = self.pagination_class()
-            curriculum_page = paginator.paginate_queryset(student_list, request)
-            serializer = GetStudentSerializer(curriculum_page, many=True)
+            result_page = paginator.paginate_queryset(student_list, request)
+            serializer = GetStudentSerializer(result_page, many=True)
             return paginator.get_paginated_response({"data": serializer.data, "Message": "Trả kết quả theo page!!", "errCode": "0"})
         else:
             # If 'page' is not in request, return all results
@@ -334,8 +334,8 @@ class DegreeList(APIView):
         # Check if 'page' parameter is present in the request
         if 'page' in request.query_params:
             paginator = self.pagination_class()
-            curriculum_page = paginator.paginate_queryset(degree_list, request)
-            serializer = DegreeSerializer(curriculum_page, many=True)
+            result_page = paginator.paginate_queryset(degree_list, request)
+            serializer = DegreeSerializer(result_page, many=True)
             return paginator.get_paginated_response({"data": serializer.data,"message":"Trả kết quả theo page" ,"errCode": "0"})
         else:
             # If 'page' is not in request, return all results
@@ -476,8 +476,8 @@ class AcademicIntakeSession_AcademicProgram_Curriculum_List(APIView):
     def get(self, request, format=None):
         academicIntakeSession_AcademicProgram_Curriculum_list = academic_intake_session_academic_program_curriculum.objects.all()
         paginator = self.pagination_class()
-        curriculum_page = paginator.paginate_queryset(academicIntakeSession_AcademicProgram_Curriculum_list, request)
-        serializer = Get_AcademicIntakeSession_AcademicProgram_Curriculum_Serializers(curriculum_page, many=True)
+        academicIntakeSession_AcademicProgram_Curriculum_page = paginator.paginate_queryset(academicIntakeSession_AcademicProgram_Curriculum_list, request)
+        serializer = Get_AcademicIntakeSession_AcademicProgram_Curriculum_Serializers(academicIntakeSession_AcademicProgram_Curriculum_page, many=True)
         return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
     def post(self, request, format=None):
         serializer = Post_AcademicIntakeSession_AcademicProgram_Curriculum_Serializers(data=request.data)
@@ -521,8 +521,8 @@ class Student_AcademicIntakeSession_AcademicProgram_List(APIView):
     def get(self, request, format=None):
         student_AcademicIntakeSession_AcademicProgram_list = student_academic_intake_session_academic_program.objects.all()
         paginator = self.pagination_class()
-        curriculum_page = paginator.paginate_queryset(student_AcademicIntakeSession_AcademicProgram_list, request)
-        serializer = Get_Student_AcademicIntakeSession_AcademicProgram_Serializers(curriculum_page, many=True)
+        result_page = paginator.paginate_queryset(student_AcademicIntakeSession_AcademicProgram_list, request)
+        serializer = Get_Student_AcademicIntakeSession_AcademicProgram_Serializers(result_page, many=True)
         return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
     def post(self, request, format=None):
         serializer = Post_Student_AcademicIntakeSession_AcademicProgram_Serializers(data=request.data)
@@ -566,8 +566,8 @@ class DiplomaManagementProfileList(APIView):
     def get(self, request, format=None):
         diplomaManagementProfile = diploma_management_profile.objects.all()
         paginator = self.pagination_class()
-        curriculum_page = paginator.paginate_queryset(diplomaManagementProfile, request)
-        serializer = GetDiplomaManagementProfileSerializer(curriculum_page, many=True)
+        result_page = paginator.paginate_queryset(diplomaManagementProfile, request)
+        serializer = GetDiplomaManagementProfileSerializer(result_page, many=True)
         return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
     def post(self, request, format=None):
         serializer = PostDiplomaManagementProfileSerializer(data=request.data)
