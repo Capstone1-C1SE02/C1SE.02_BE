@@ -28,8 +28,8 @@ urlpatterns = [
     
 
     ### Curriculum URLs##############
-    path('curriculum', CurriculumList.as_view()),
-    path('curriculum/<int:pk>', CurriculumDetail.as_view()),
+    path('curriculum', CurriculumList.as_view(),name='curriculum-list'),
+    path('curriculum/<int:pk>', CurriculumDetail.as_view(),name='curriculum-id'),
 
     #### Student URLs##############
     path('student', StudentList.as_view()),

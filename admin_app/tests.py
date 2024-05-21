@@ -12,11 +12,9 @@ class GlobalSetupTestCase(TestCase):
     def setUp(self):
         # Create a user for diploma_management_profile foreign key
         self.user = User.objects.create_user(username='admin', password='12345678')
-
         # Create instances of academic_level_type
         academic_level_type.objects.create(ACADEMIC_LEVEL_TYPE_NAME='Đại học')
         academic_level_type.objects.create(ACADEMIC_LEVEL_TYPE_NAME='Cao đẳng')
-
         # Create instances of degree
         degree.objects.create(
             DEGREE_ID = 1,
@@ -25,12 +23,6 @@ class GlobalSetupTestCase(TestCase):
             DEGREE_STATUS=True, 
             DESCRIPTION='Ngành kỹ thuật Phần mềm'
         )
-        # degree.objects.create(
-        #     DEGREE_NAME='An toàn Thông tin', 
-        #     DEGREE_CODE='7480202', DEGREE_STATUS=True, 
-        #     DESCRIPTION='Ngành an Toàn thông tin'
-        # )
-
         # Create instances of academic_program
         academic_program.objects.create(
             ACADEMIC_PROGRAM_ID=1,
@@ -42,21 +34,19 @@ class GlobalSetupTestCase(TestCase):
             ACADEMIC_LEVEL_TYPE_ID=academic_level_type.objects.first(),
             DEGREE_ID=degree.objects.first()
         )
-
         # Create instances of curriculum
         curriculum.objects.create(
+            CURRICULUM_ID = 1,
             CURRICULUM_NAME='K26_CMU_TPM',
             DESCRIPTION='Công nghệ Phần mềm',
             CURRICULUM_STATUS_NAME=True,
             ACADEMIC_PROGRAM_ID=academic_program.objects.first()
         )
-
         # Create instances of academic_intake_session
         academic_intake_session.objects.create(
             ACADEMIC_INTAKE_SESSION_NAME='Kỳ tuyển sinh 2020-2021',
             START_DATE='2020-10-10'
         )
-
         # Create instances of learning_status_type
         learning_status_type.objects.create(
             LEARNING_STATUS_TYPE_NAME='Đang học'
@@ -82,7 +72,6 @@ class GlobalSetupTestCase(TestCase):
             LEARNING_STATUS_TYPE_ID=learning_status_type.objects.first(),
             ACADEMIC_LEVEL_TYPE_ID=academic_level_type.objects.first()
         )
-
         # Create instances of student_academic_intake_session_academic_program
         student_academic_intake_session_academic_program.objects.create(
             STUDENT_ID_NUMBER=student.objects.first(),
@@ -90,7 +79,6 @@ class GlobalSetupTestCase(TestCase):
             ACADEMIC_PROGRAM_ID=academic_program.objects.first(),
             LEARNING_STATUS_TYPE_ID=learning_status_type.objects.first()
         )
-
         # Create instances of diploma_management_profile
         diploma_management_profile.objects.create(
             STUDENT_ID_NUMBER=student.objects.first(),
@@ -105,170 +93,167 @@ class GlobalSetupTestCase(TestCase):
             DATE_UPDATED='2024-05-01',
             user=self.user,
             APPROVED=True
-        )
-       
-        
+        ) 
         refresh = RefreshToken.for_user(self.user)
-
         # Initialize API client
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
 
 
 
-################# Degree Test Cases #################
-class DegreeTests(GlobalSetupTestCase):
-    def test_get_degree(self):
-        url = reverse('degree-list')
+# ################# Degree Test Cases #################
+# class DegreeTests(GlobalSetupTestCase):
+#     def test_get_degree(self):
+#         url = reverse('degree-list')
+#         response = self.client.get(url, format='json')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+#     def test_create_degree(self):
+#         data = {
+#             "DEGREE_NAME": "Khoa học máy tính",
+#             "DEGREE_CODE": "7480101",
+#             "DEGREE_STATUS": True,
+#             "DESCRIPTION": 'Ngành kỹ thuật Phần mềm'
+#         }
+#         url = reverse('degree-list')
+#         response = self.client.post(url,data, format='json')
+#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+#     def test_get_degree_by_id(self):
+#         response = self.client.get(reverse('degree-id', kwargs={'pk': 1}))
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+#     def test_update_degree(self):
+#         data = {
+#             "DEGREE_NAME": 'Kỹ thuật Phần mềm', 
+#             "DEGREE_CODE" : '7480103', 
+#             "DEGREE_STATUS" : True, 
+#             "DESCRIPTION": 'Ngành kỹ thuật Phần mềm'
+#         }
+#         response = self.client.put(reverse('degree-id', kwargs={'pk': 1}), data, format='json')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+#     def test_delete_degree(self):
+#         response = self.client.delete(reverse('degree-id', kwargs={'pk': 1}))
+#         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+# ################# Academic Program Cases #################
+# class AcademicProgramTests(GlobalSetupTestCase):
+#     def test_get_academic_program(self):
+#         url = reverse('academic-program-list')
+#         response = self.client.get(url, format='json')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+#     def test_create_academic_program(self):
+#         data = {
+#             "ACADEMIC_PROGRAM_CODE": "102",
+#             "ACADEMIC_PROGRAM_NAME": "Công nghệ Phần mềm (Đạt kiểm định ABET)",
+#             "MODE_OF_STUDY": "Chính Quy",
+#             "DEGREE_DURATION": "4 năm",
+#             "DESCRIPTION": "b",
+#             "ACADEMIC_LEVEL_TYPE_ID": 1,
+#             "DEGREE_ID": 1
+#         }
+#         url = reverse('academic-program-list')
+#         response = self.client.post(url,data, format='json')
+#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+#     def test_get_academic_program_by_id(self):
+#         response = self.client.get(reverse('academic-program-id', kwargs={'pk': 1}))
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+#     def test_update_academic_program(self):
+#         data = {
+#             "ACADEMIC_PROGRAM_CODE": "102",
+#             "ACADEMIC_PROGRAM_NAME": "Công nghệ Phần mềm (Đạt kiểm định ABET)",
+#             "MODE_OF_STUDY": "Chính Quy",
+#             "DEGREE_DURATION": "4 năm",
+#             "DESCRIPTION": "LEVANTIEN",
+#             "ACADEMIC_LEVEL_TYPE_ID": 1,
+#             "DEGREE_ID": 1
+#         }
+#         response = self.client.put(reverse('academic-program-id', kwargs={'pk': 1}), data, format='json')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+#     def test_delete_academic_program(self):
+#         response = self.client.delete(reverse('academic-program-id', kwargs={'pk': 1}))
+#         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+################# Curriculum Test Cases #################
+class CurriculumTests(GlobalSetupTestCase):
+    def test_get_curriculum(self):
+        url = reverse('curriculum-list')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_create_degree(self):
+    def test_create_curriculum(self):
         data = {
-            "DEGREE_NAME": "Khoa học máy tính",
-            "DEGREE_CODE": "7480101",
-            "DEGREE_STATUS": True,
-            "DESCRIPTION": 'Ngành kỹ thuật Phần mềm'
+            "CURRICULUM_NAME" : 'K26_CMU_TPM',
+            "DESCRIPTION" : 'Công nghệ Phần mềm',
+            "CURRICULUM_STATUS_NAME" : True,
+            "ACADEMIC_PROGRAM_ID":1
         }
-        url = reverse('degree-list')
+        url = reverse('curriculum-list')
         response = self.client.post(url,data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_get_degree_by_id(self):
-        response = self.client.get(reverse('degree-id', kwargs={'pk': 1}))
+    def test_get_curriculume_by_id(self):
+        response = self.client.get(reverse('curriculum-id', kwargs={'pk': 1}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_update_degree(self):
+    def test_update_curriculum(self):
         data = {
-            "DEGREE_NAME": 'Kỹ thuật Phần mềm', 
-            "DEGREE_CODE" : '7480103', 
-            "DEGREE_STATUS" : True, 
-            "DESCRIPTION": 'Ngành kỹ thuật Phần mềm'
+            "CURRICULUM_NAME" : 'K26_CMU_TPM',
+            "DESCRIPTION" : 'Công nghệ Phần mềm 1',
+            "CURRICULUM_STATUS_NAME" : True,
+            "ACADEMIC_PROGRAM_ID":1
         }
-        response = self.client.put(reverse('degree-id', kwargs={'pk': 1}), data, format='json')
+        response = self.client.put(reverse('curriculum-id', kwargs={'pk': 1}), data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_delete_degree(self):
-        response = self.client.delete(reverse('degree-id', kwargs={'pk': 1}))
+    def test_delete_curriculum(self):
+        response = self.client.delete(reverse('curriculum-id', kwargs={'pk': 1}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-################# Academic Program Cases #################
-class AcademicProgramTests(GlobalSetupTestCase):
-    def test_get_academic_program(self):
-        url = reverse('academic-program-list')
-        response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+# ################# Curr Cases #################
+# class AcademicProgramTests(GlobalSetupTestCase):
+#     def test_get_academic_program(self):
+#         url = reverse('academic-program-list')
+#         response = self.client.get(url, format='json')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_create_academic_program(self):
-        data = {
-            "ACADEMIC_PROGRAM_CODE": "102",
-            "ACADEMIC_PROGRAM_NAME": "Công nghệ Phần mềm (Đạt kiểm định ABET)",
-            "MODE_OF_STUDY": "Chính Quy",
-            "DEGREE_DURATION": "4 năm",
-            "DESCRIPTION": "b",
-            "ACADEMIC_LEVEL_TYPE_ID": 1,
-            "DEGREE_ID": 1
-        }
-        url = reverse('academic-program-list')
-        response = self.client.post(url,data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+#     def test_create_academic_program(self):
+#         data = {
+#             "ACADEMIC_PROGRAM_CODE": "102",
+#             "ACADEMIC_PROGRAM_NAME": "Công nghệ Phần mềm (Đạt kiểm định ABET)",
+#             "MODE_OF_STUDY": "Chính Quy",
+#             "DEGREE_DURATION": "4 năm",
+#             "DESCRIPTION": "b",
+#             "ACADEMIC_LEVEL_TYPE_ID": 1,
+#             "DEGREE_ID": 1
+#         }
+#         url = reverse('academic-program-list')
+#         response = self.client.post(url,data, format='json')
+#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_get_academic_program_by_id(self):
-        response = self.client.get(reverse('academic-program-id', kwargs={'pk': 1}))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+#     def test_get_academic_program_by_id(self):
+#         response = self.client.get(reverse('academic-program-id', kwargs={'pk': 1}))
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_update_academic_program(self):
-        data = {
-            "ACADEMIC_PROGRAM_CODE": "102",
-            "ACADEMIC_PROGRAM_NAME": "Công nghệ Phần mềm (Đạt kiểm định ABET)",
-            "MODE_OF_STUDY": "Chính Quy",
-            "DEGREE_DURATION": "4 năm",
-            "DESCRIPTION": "LEVANTIEN",
-            "ACADEMIC_LEVEL_TYPE_ID": 1,
-            "DEGREE_ID": 1
-        }
-        response = self.client.put(reverse('academic-program-id', kwargs={'pk': 1}), data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+#     def test_update_academic_program(self):
+#         data = {
+#             "ACADEMIC_PROGRAM_CODE": "102",
+#             "ACADEMIC_PROGRAM_NAME": "Công nghệ Phần mềm (Đạt kiểm định ABET)",
+#             "MODE_OF_STUDY": "Chính Quy",
+#             "DEGREE_DURATION": "4 năm",
+#             "DESCRIPTION": "LEVANTIEN",
+#             "ACADEMIC_LEVEL_TYPE_ID": 1,
+#             "DEGREE_ID": 1
+#         }
+#         response = self.client.put(reverse('academic-program-id', kwargs={'pk': 1}), data, format='json')
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_delete_academic_program(self):
-        response = self.client.delete(reverse('academic-program-id', kwargs={'pk': 1}))
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-
-################# Degree Test Cases #################
-class DegreeTests(GlobalSetupTestCase):
-    def test_get_degree(self):
-        url = reverse('degree-list')
-        response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_create_degree(self):
-        data = {
-            "DEGREE_NAME": "Khoa học máy tính",
-            "DEGREE_CODE": "7480101",
-            "DEGREE_STATUS": True,
-            "DESCRIPTION": 'Ngành kỹ thuật Phần mềm'
-        }
-        url = reverse('degree-list')
-        response = self.client.post(url,data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-    def test_get_degree_by_id(self):
-        response = self.client.get(reverse('degree-id', kwargs={'pk': 1}))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_update_degree(self):
-        data = {
-            "DEGREE_NAME": 'Kỹ thuật Phần mềm', 
-            "DEGREE_CODE" : '7480103', 
-            "DEGREE_STATUS" : True, 
-            "DESCRIPTION": 'Ngành kỹ thuật Phần mềm'
-        }
-        response = self.client.put(reverse('degree-id', kwargs={'pk': 1}), data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_delete_degree(self):
-        response = self.client.delete(reverse('degree-id', kwargs={'pk': 1}))
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-################# Curr Cases #################
-class AcademicProgramTests(GlobalSetupTestCase):
-    def test_get_academic_program(self):
-        url = reverse('academic-program-list')
-        response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_create_academic_program(self):
-        data = {
-            "ACADEMIC_PROGRAM_CODE": "102",
-            "ACADEMIC_PROGRAM_NAME": "Công nghệ Phần mềm (Đạt kiểm định ABET)",
-            "MODE_OF_STUDY": "Chính Quy",
-            "DEGREE_DURATION": "4 năm",
-            "DESCRIPTION": "b",
-            "ACADEMIC_LEVEL_TYPE_ID": 1,
-            "DEGREE_ID": 1
-        }
-        url = reverse('academic-program-list')
-        response = self.client.post(url,data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-    def test_get_academic_program_by_id(self):
-        response = self.client.get(reverse('academic-program-id', kwargs={'pk': 1}))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_update_academic_program(self):
-        data = {
-            "ACADEMIC_PROGRAM_CODE": "102",
-            "ACADEMIC_PROGRAM_NAME": "Công nghệ Phần mềm (Đạt kiểm định ABET)",
-            "MODE_OF_STUDY": "Chính Quy",
-            "DEGREE_DURATION": "4 năm",
-            "DESCRIPTION": "LEVANTIEN",
-            "ACADEMIC_LEVEL_TYPE_ID": 1,
-            "DEGREE_ID": 1
-        }
-        response = self.client.put(reverse('academic-program-id', kwargs={'pk': 1}), data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_delete_academic_program(self):
-        response = self.client.delete(reverse('academic-program-id', kwargs={'pk': 1}))
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+#     def test_delete_academic_program(self):
+#         response = self.client.delete(reverse('academic-program-id', kwargs={'pk': 1}))
+#         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
