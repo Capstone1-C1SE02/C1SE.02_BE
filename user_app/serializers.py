@@ -26,7 +26,7 @@ class DiplomaManagementProfileSerializer(serializers.ModelSerializer):
     BIRTH_DATE = serializers.DateField(source='STUDENT_ID_NUMBER.BIRTH_DATE')
     class Meta:
         model = diploma_management_profile
-        exclude  = ["ACADEMIC_PROGRAM_ID","user","DIPLOMA_MANAGEMENT_PROFILE_ID","COMMENT","DATE_UPDATED","APPORVED"]
+        exclude  = ["ACADEMIC_PROGRAM_ID","user","DIPLOMA_MANAGEMENT_PROFILE_ID","COMMENT","DATE_UPDATED","APPROVED"]
     
     
 class ImageUploadSerializer(serializers.Serializer):
