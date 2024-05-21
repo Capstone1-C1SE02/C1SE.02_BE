@@ -3,7 +3,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from django.urls import reverse
 from .models import *
-from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 
 
@@ -159,14 +159,14 @@ class GlobalSetupTestCase(TestCase):
             APPROVED=True
         )
 
-        # The app uses token authentication
-        self.token = Token.objects.create(user=self.user)
+        refresh = RefreshToken.for_user(self.user)
+        self.access_token = str(refresh.access_token)
 
         # Initialize API client
         self.client = APIClient()
 
         # Pass the token in all calls to the API
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.access_token)
 
 
 
@@ -179,7 +179,7 @@ class DegreeTests(GlobalSetupTestCase):
             "DEGREE_CODE": "7480101",
             "DEGREE_STATUS": True
         }
-        response = self.client.post('/degree', format='json')
+        response = self.client.post('api/degree', format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(degree.objects.count(), 3)
     # def test_get_academic_program(self):
