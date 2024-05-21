@@ -36,12 +36,12 @@ urlpatterns = [
     path('student/<int:pk>', StudentDetail.as_view()),
 
     ### Degree URLs##############
-    path('degree', DegreeList.as_view()),
-    path('degree/<int:pk>', DegreeDetail.as_view()),
+    path('degree', DegreeList.as_view(), name='degree-list'),
+    path('degree/<int:pk>', DegreeDetail.as_view(),name='degree-id'),
 
     ### Academic Program URLs##############
-    path('academicprogram', AcademicProgramList.as_view()),
-    path('academicprogram/<int:pk>', AcademicProgramDetail.as_view()),
+    path('academicprogram', AcademicProgramList.as_view(),name='academic-program-list'),
+    path('academicprogram/<int:pk>', AcademicProgramDetail.as_view(),name='academic-program-id'),
 
     ### Academic Intake Session Academic Program Curriculum URLs##############
     path('academicintakesessionacademicprogramcurriculum', AcademicIntakeSession_AcademicProgram_Curriculum_List.as_view()),
