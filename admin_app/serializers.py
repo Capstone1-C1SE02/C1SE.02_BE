@@ -109,7 +109,6 @@ class Post_AcademicIntakeSession_AcademicProgram_Curriculum_Serializers(serializ
         fields = '__all__'
 
 ###### Student_AcademicIntakeSession_AcademicProgramSerializers #######
-
 class Student_Serializer(serializers.ModelSerializer):
     class Meta:
         model = student

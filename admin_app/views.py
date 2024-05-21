@@ -159,13 +159,6 @@ class LearningStatusTypeDetail(APIView):
 
 
 
-
-
-
-
-
-
-
 ##########################################
 ################## API ###################
 ##########################################
@@ -270,10 +263,15 @@ class StudentList(APIView):
     pagination_class = MyPagination
     def get(self, request, format=None):
         student_list = student.objects.all()
-        paginator = self.pagination_class()  # Khởi tạo paginator
-        curriculum_page = paginator.paginate_queryset(student_list, request)
-        serializer = GetStudentSerializer(curriculum_page, many=True)
-        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
+        if 'page' in request.query_params:
+            paginator = self.pagination_class()
+            curriculum_page = paginator.paginate_queryset(student_list, request)
+            serializer = GetStudentSerializer(curriculum_page, many=True)
+            return paginator.get_paginated_response({"data": serializer.data, "Message": "Trả kết quả theo page!!", "errCode": "0"})
+        else:
+            # If 'page' is not in request, return all results
+            serializer = GetStudentSerializer(student_list, many=True)
+            return Response({"data": serializer.data, "Message": "Trả All!!", "errCode": "0"})
     def post(self, request, format=None):
         serializer = PostStudentSerializer(data=request.data)
         if serializer.is_valid():
@@ -308,6 +306,22 @@ class StudentDetail(APIView):
         student_temp.delete()
         return Response({"message": "Xóa thành công","errCode":"0"}, status=status.HTTP_204_NO_CONTENT)
     
+## Search Student API ##
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class SearchStudent(APIView):
+    def post(self, request, format=None):
+        # Get the 'name' query parameter from the request
+        student_id= request.query_params.get('studentID', None)
+
+        if student_id:
+            # Filter students by name (case-insensitive)
+            student_information = student.objects.get(STUDENT_ID_NUMBER=student_id)
+            serializer = GetStudentSerializer(student_information, many=False)
+            return Response({"data": serializer.data, "Message": "Lấy dữ liệu thành công!!", "errCode": "0"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"Message": "Vui lòng cung cấp mã sinh viên để tìm kiếm", "errCode": "1"}, status=status.HTTP_400_BAD_REQUEST)
+######----------------------------------------------------------------------------------------------#####
 
 
 ####### Degree API ########
@@ -317,10 +331,16 @@ class DegreeList(APIView):
     pagination_class = MyPagination
     def get(self, request, format=None):
         degree_list = degree.objects.all()
-        paginator = self.pagination_class()  # Khởi tạo paginator
-        curriculum_page = paginator.paginate_queryset(degree_list, request)
-        serializer = DegreeSerializer(curriculum_page, many=True)
-        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
+        # Check if 'page' parameter is present in the request
+        if 'page' in request.query_params:
+            paginator = self.pagination_class()
+            curriculum_page = paginator.paginate_queryset(degree_list, request)
+            serializer = DegreeSerializer(curriculum_page, many=True)
+            return paginator.get_paginated_response({"data": serializer.data,"message":"Trả kết quả theo page" ,"errCode": "0"})
+        else:
+            # If 'page' is not in request, return all results
+            serializer = DegreeSerializer(degree_list, many=True)
+            return Response({"data": serializer.data,"message":"Trả All" , "errCode": "0"})
     def post(self, request, format=None):
         serializer = DegreeSerializer(data=request.data)
         if serializer.is_valid():
@@ -354,7 +374,27 @@ class DegreeDetail(APIView):
         degree_temp = self.get_object(pk)
         degree_temp.delete()
         return Response({"message": "Xóa thành công","errCode":"0"}, status=status.HTTP_204_NO_CONTENT)
-    
+
+
+### Search Degree API ###
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class SearchDegree(APIView):
+    def post(self, request, format=None):
+        # Get the 'name' query parameter from the request
+        student_id= request.query_params.get('studentID', None)
+
+        if student_id:
+            # Filter students by name (case-insensitive)
+            student_information = student.objects.get(STUDENT_ID_NUMBER=student_id)
+            serializer = GetStudentSerializer(student_information, many=False)
+            return Response({"data": serializer.data, "Message": "Lấy dữ liệu thành công!!", "errCode": "0"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"Message": "Vui lòng cung cấp mã sinh viên để tìm kiếm", "errCode": "1"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+######----------------------------------------------------------------------------------------------#####  
 
 
 ###### Academic Program API ######
@@ -364,10 +404,15 @@ class AcademicProgramList(APIView):
     pagination_class = MyPagination
     def get(self, request, format=None):
         academic_program_list = academic_program.objects.all()
-        paginator = self.pagination_class()
-        curriculum_page = paginator.paginate_queryset(academic_program_list, request)
-        serializer = GetAcademicProgramSerializer(curriculum_page, many=True)
-        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
+        if 'page' in request.query_params:
+            paginator = self.pagination_class()
+            curriculum_page = paginator.paginate_queryset(academic_program_list, request)
+            serializer = GetAcademicProgramSerializer(curriculum_page, many=True)
+            return paginator.get_paginated_response({"data": serializer.data,"message":"Trả kết quả theo page!!", "errCode": "0"})
+        else:
+            # If 'page' is not in request, return all results
+            serializer = GetAcademicProgramSerializer(academic_program_list, many=True)
+            return Response({"data": serializer.data,"message":"Trả all !!", "errCode": "0"})
     def post(self, request, format=None):
         serializer = PostAcademicProgramSerializer(data=request.data)
         if serializer.is_valid():
@@ -401,7 +446,26 @@ class AcademicProgramDetail(APIView):
         academic_program_temp = self.get_object(pk)
         academic_program_temp.delete()
         return Response({"message": "Xóa thành công","errCode":"0"}, status=status.HTTP_204_NO_CONTENT)
-    
+
+
+### Search Academic Program API ###
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class SearchAcademicProgram(APIView):
+    def post(self, request, format=None):
+        # Get the 'name' query parameter from the request
+        student_id= request.query_params.get('studentID', None)
+
+        if student_id:
+            # Filter students by name (case-insensitive)
+            student_information = student.objects.get(STUDENT_ID_NUMBER=student_id)
+            serializer = GetStudentSerializer(student_information, many=False)
+            return Response({"data": serializer.data, "Message": "Lấy dữ liệu thành công!!", "errCode": "0"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"Message": "Vui lòng cung cấp mã sinh viên để tìm kiếm", "errCode": "1"}, status=status.HTTP_400_BAD_REQUEST)
+
+######----------------------------------------------------------------------------------------------#####   
+
 
 ###### AcademicIntakeSession AcademicProgram Curriculum API ######
 @authentication_classes([JWTAuthentication])

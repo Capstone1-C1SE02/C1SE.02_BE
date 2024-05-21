@@ -51,7 +51,13 @@ urlpatterns = [
     path('studentacademicintakesessionacademicprogram', Student_AcademicIntakeSession_AcademicProgram_List.as_view()),
     path('studentacademicintakesessionacademicprogram/<int:pk>', Student_AcademicIntakeSession_AcademicProgram_Detail.as_view()),
 
-    ### Diploma Management Profile URLs############## u
+    ### Diploma Management Profile URLs ############## 
     path('diplomamanagementprofile', DiplomaManagementProfileList.as_view()),
     path('diplomamanagementprofile/<int:pk>', DiplomaManagementProfileDetail.as_view()),
+
+    ### Search URLs ##############
+    path('search/student', SearchStudent.as_view()),
+    path('search/degree', SearchDegree.as_view()),
+    path('search/academicprogram', SearchAcademicProgram.as_view()),
+
 ]   

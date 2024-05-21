@@ -38,7 +38,7 @@ class academic_intake_session_academic_program_curriculum(models.Model):
     ACADEMIC_INTAKE_SESSION_ID = models.ForeignKey(academic_intake_session, on_delete = models.CASCADE, to_field = 'ACADEMIC_INTAKE_SESSION_ID')
     ACADEMIC_PROGRAM_ID = models.ForeignKey(academic_program, on_delete = models.CASCADE, to_field = 'ACADEMIC_PROGRAM_ID')
     CURRICULUM_ID = models.ForeignKey(curriculum, on_delete = models.CASCADE, to_field = 'CURRICULUM_ID')
-    STATUS_NAME = models.CharField(max_length=50,default = True)
+    STATUS_NAME = models.BooleanField(default=True)
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['ACADEMIC_INTAKE_SESSION_ID', 'ACADEMIC_PROGRAM_ID', 'CURRICULUM_ID'], name='PK_intake_session_program_curriculum')
@@ -55,7 +55,7 @@ class student(models.Model):
     MIDDLE_NAME = models.CharField(max_length=20,null= False)
     GENDER = models.BooleanField()
     BIRTH_DATE = models.DateField(null=False)
-    BIRTH_PLACE = models.CharField(max_length=100,null=False)
+    BIRTH_PLACE = models.CharField(max_length=255,null=False)
     PEOPLE_ID_NUMBER = models.CharField(max_length=50,null= False)
     NATION = models.CharField(max_length=50,null= False)
     NATIONALITY = models.CharField(max_length=50,null= False)
@@ -78,10 +78,7 @@ class student_academic_intake_session_academic_program(models.Model):
 
 class diploma_management_profile(models.Model):
     DIPLOMA_MANAGEMENT_PROFILE_ID = models.AutoField(primary_key=True)
-    STUDENT_ID_NUMBER = models.ForeignKey(student, on_delete = models.CASCADE, to_field = 'STUDENT_ID_NUMBER')
-    LAST_NAME = models.CharField(max_length=20,null= False,default=None)
-    FIRST_NAME = models.CharField(max_length=20,null= False,default=None)
-    MIDDLE_NAME = models.CharField(max_length=20,null= False,default=None)
+    STUDENT_ID_NUMBER = models.OneToOneField(student, on_delete = models.CASCADE, to_field = 'STUDENT_ID_NUMBER')
     ACADEMIC_PROGRAM_ID = models.ForeignKey(academic_program, on_delete = models.CASCADE, to_field = 'ACADEMIC_PROGRAM_ID')
     GRADUATION_YEAR = models.CharField(max_length=20,null= False)
     MODE_OF_STUDY = models.CharField(max_length=50,null= False)
@@ -92,6 +89,6 @@ class diploma_management_profile(models.Model):
     COMMENT = models.CharField(max_length=500,null= True, default=None)
     DATE_UPDATED = models.DateField(null= False,auto_now=True)
     user = models.ForeignKey(User, on_delete = models.CASCADE)
-    APPORVEDY = models.BooleanField(default=False)
+    APPORVED = models.BooleanField(default=False)
 
    

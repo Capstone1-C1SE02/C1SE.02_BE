@@ -4,4 +4,5 @@ from .views import *
 urlpatterns = [
     path('generate-captcha', GenerateCaptchaAPIView.as_view(), name='generate-captcha'),
     path('informationretrievalthroughtext', InformationRetrievalthroughTextAPIView.as_view(), name='information-retrieval-through-text'),
+    path('informationretrievalthroughimage', InformationRetrievalthroughImageAPIView.as_view(), name='information-retrieval-through-image'),
 ]
