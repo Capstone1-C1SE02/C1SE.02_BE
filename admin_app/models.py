@@ -89,6 +89,6 @@ class diploma_management_profile(models.Model):
     COMMENT = models.CharField(max_length=500,null= True, default=None)
     DATE_UPDATED = models.DateField(null= False,auto_now=True)
     user = models.ForeignKey(User, on_delete = models.CASCADE)
-    APPORVED = models.BooleanField(default=False)
+    APPROVED = models.BooleanField(default=False)
 
    
