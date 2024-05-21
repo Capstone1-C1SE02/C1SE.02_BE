@@ -172,7 +172,7 @@ class AcademicIntakeSessionList(APIView):
         paginator = self.pagination_class()  # Khởi tạo paginator
         result_page = paginator.paginate_queryset(academicIntakeSession, request)
         serializer = AcademicIntakeSessionSerializer(result_page, many=True)
-        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"},status=status.HTTP_200_OK)
+        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
     def post(self, request, format=None):
         serializer = AcademicIntakeSessionSerializer(data=request.data)
         if serializer.is_valid():
@@ -219,7 +219,7 @@ class CurriculumList(APIView):
         paginator = self.pagination_class()  # Khởi tạo paginator
         curriculum_page = paginator.paginate_queryset(curriculum_temp, request)
         serializer = GetCurriculumSerializer(curriculum_page, many=True)
-        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"},status=status.HTTP_200_OK)
+        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
     def post(self, request, format=None):
         serializer = PostCurriculumSerializer(data=request.data)
         if serializer.is_valid():
@@ -267,7 +267,7 @@ class StudentList(APIView):
             paginator = self.pagination_class()
             curriculum_page = paginator.paginate_queryset(student_list, request)
             serializer = GetStudentSerializer(curriculum_page, many=True)
-            return paginator.get_paginated_response({"data": serializer.data, "Message": "Trả kết quả theo page!!", "errCode": "0"},status=status.HTTP_200_OK)
+            return paginator.get_paginated_response({"data": serializer.data, "Message": "Trả kết quả theo page!!", "errCode": "0"})
         else:
             # If 'page' is not in request, return all results
             serializer = GetStudentSerializer(student_list, many=True)
@@ -406,8 +406,8 @@ class AcademicProgramList(APIView):
         academic_program_list = academic_program.objects.all()
         if 'page' in request.query_params:
             paginator = self.pagination_class()
-            curriculum_page = paginator.paginate_queryset(academic_program_list, request)
-            serializer = GetAcademicProgramSerializer(curriculum_page, many=True)
+            academic_program_page = paginator.paginate_queryset(academic_program_list, request)
+            serializer = GetAcademicProgramSerializer(academic_program_page, many=True)
             return paginator.get_paginated_response({"data": serializer.data,"message":"Trả kết quả theo page!!", "errCode": "0"})
         else:
             # If 'page' is not in request, return all results
