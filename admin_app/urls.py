@@ -60,4 +60,7 @@ urlpatterns = [
     path('search/degree', SearchDegree.as_view()),
     path('search/academicprogram', SearchAcademicProgram.as_view()),
 
+    ### Excel Upload URLs ##############
+    path('upload-student', UploadStudentExcel.as_view(), name='upload_student_excel'),
+    path('upload-diploma', UploadDiplomaExcel.as_view(), name='upload-diploma'),
 ]   
