@@ -328,3 +328,129 @@ class StudentTests(GlobalSetupTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
+# ####   academic_intake_session_academic_program_curriculum   #####
+class AISAPCTests(GlobalSetupTestCase):
+    def test_get_AISAPC(self):
+        url = reverse('AISAPC-list')
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_create_AISAPC(self):
+        data = {
+            "id":10,
+            "ACADEMIC_INTAKE_SESSION_ID":2,
+            "ACADEMIC_PROGRAM_ID":1,
+            "CURRICULUM_ID": 1,
+            "STATUS_NAME": True
+        }
+        url = reverse('AISAPC-list')
+        response = self.client.post(url,data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_get_AISAPC_by_id(self):
+        response = self.client.get(reverse('AISAPC-id', kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_update_AISAPC(self):
+        data = {
+            "ACADEMIC_INTAKE_SESSION_ID":2,
+            "ACADEMIC_PROGRAM_ID":1,
+            "CURRICULUM_ID": 1,
+            "STATUS_NAME": True
+        }
+        response = self.client.put(reverse('AISAPC-id', kwargs={'pk': 1}), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_delete_AISAPC(self):
+        response = self.client.delete(reverse('AISAPC-id', kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+# ####   student_academic_intake_session_academic_program   #####
+class SAISAPTests(GlobalSetupTestCase):
+    def test_get_SAISAP(self):
+        url = reverse('SAISAP-list')
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_create_SAISAP(self):
+        data = {
+            "ACADEMIC_INTAKE_SESSION_ID":2,
+            "ACADEMIC_PROGRAM_ID":1,
+            "STUDENT_ID_NUMBER": "26211220570",
+            "LEARNING_STATUS_TYPE_ID": 1
+        }
+        url = reverse('SAISAP-list')
+        response = self.client.post(url,data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_get_SAISAP_by_id(self):
+        response = self.client.get(reverse('SAISAP-id', kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_update_SAISAP(self):
+        data = {
+            "ACADEMIC_INTAKE_SESSION_ID":1,
+            "ACADEMIC_PROGRAM_ID":1,
+            "STUDENT_ID_NUMBER": "26211220570",
+            "LEARNING_STATUS_TYPE_ID": 1
+        }
+        response = self.client.put(reverse('SAISAP-id', kwargs={'pk': 1}), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_delete_SAISAP(self):
+        response = self.client.delete(reverse('SAISAP-id', kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+
+class DiplomaTests(GlobalSetupTestCase):
+    def test_get_Diploma(self):
+        url = reverse('Diploma-list')
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    # def test_create_Diploma(self):
+    #     data = {
+    #         "DIPLOMA_MANAGEMENT_PROFILE_ID" : 1,
+    #         "STUDENT_ID_NUMBER" : "26211220570",
+    #         "ACADEMIC_PROGRAM_ID":1,
+    #         "GRADUATION_YEAR":'2024',
+    #         "MODE_OF_STUDY" : "Chính quy",
+    #         "CLASSIFIED_BY_ACADEMIC_RECORDS":'Giỏi',
+    #         "CERTIFICATE_NUMBER":'123433',
+    #         "NUMBER_ENTERED_INTO_THE_DEGREE_TRACKING_BOOK":'25032002',
+    #         "DATE_OF_DECISION_ANNOUNCEMENT":'2024-05-01',
+    #         "COMMENT":'No comment',
+    #         "DATE_UPDATED":'2024-05-01',
+    #         # "user":self.user,
+    #         "APPROVED":True
+    #     }
+    #     url = reverse('Diploma-list')
+    #     response = self.client.post(url,data, format='json')
+    #     print(response.data)
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_get_Diploma_by_id(self):
+        response = self.client.get(reverse('Diploma-id', kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    # def test_update_Diploma(self):
+    #     data = {
+    #         "DIPLOMA_MANAGEMENT_PROFILE_ID" : 1,
+    #         "STUDENT_ID_NUMBER" : "26211220570",
+    #         "ACADEMIC_PROGRAM_ID":1,
+    #         "GRADUATION_YEAR":'2024',
+    #         "MODE_OF_STUDY" : "Chính quy",
+    #         "CLASSIFIED_BY_ACADEMIC_RECORDS":'Giỏi',
+    #         "CERTIFICATE_NUMBER":'123433',
+    #         "NUMBER_ENTERED_INTO_THE_DEGREE_TRACKING_BOOK":'25032002',
+    #         "DATE_OF_DECISION_ANNOUNCEMENT":'2024-05-01',
+    #         "COMMENT":'No comment',
+    #         "DATE_UPDATED":'2024-05-01',
+    #         # "user":self.user,
+    #         "APPROVED":True
+    #     }
+    #     response = self.client.put(reverse('Diploma-id', kwargs={'pk': 1}), data, format='json')
+    #     print(response.data)
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_delete_Diploma(self):
+        response = self.client.delete(reverse('Diploma-id', kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
