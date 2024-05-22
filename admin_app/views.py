@@ -637,16 +637,28 @@ class UploadStudentExcel(APIView):
         # Duyệt qua từng hàng của dataframe
         for _, row in df.iterrows():
             try:
+                # Lấy STUDENT_ID_NUMBER từ hàng
+                student_id_number = row['Mã Sinh Viên']
+                
+                # Kiểm tra xem STUDENT_ID_NUMBER có tồn tại trong cơ sở dữ liệu không
+                if student.objects.filter(STUDENT_ID_NUMBER=student_id_number).exists():
+                    return Response({"error": f"Sinh viên có mã số '{student_id_number}' đã tồn tại"}, status=status.HTTP_400_BAD_REQUEST)
+
                 # Chuyển đổi giới tính
                 gender = True if row['Giới tính'] == 'Nam' else False
 
-                # Tạo các instance cho các ForeignKey
-                learning_status_instance = learning_status_type.objects.get(LEARNING_STATUS_TYPE_NAME=row['Trạng thái học tập'])
-                academic_level_instance = academic_level_type.objects.get(ACADEMIC_LEVEL_TYPE_NAME=row['Bậc đào tạo'])
+                # Tìm kiếm instance cho các ForeignKey
+                learning_status_instance = learning_status_type.objects.filter(LEARNING_STATUS_TYPE_NAME=row['Trạng thái học tập']).first()
+                if not learning_status_instance:
+                    return Response({"error": f"Learning status type '{row['Trạng thái học tập']}' does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+                academic_level_instance = academic_level_type.objects.filter(ACADEMIC_LEVEL_TYPE_NAME=row['Bậc đào tạo']).first()
+                if not academic_level_instance:
+                    return Response({"error": f"Academic level type '{row['Bậc đào tạo']}' does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
                 # Tạo và lưu instance của student
                 student_instance = student(
-                    STUDENT_ID_NUMBER=row['Mã Sinh Viên'],
+                    STUDENT_ID_NUMBER=student_id_number,
                     LAST_NAME=row['Họ'],
                     FIRST_NAME=row['Tên'],
                     MIDDLE_NAME=row['Tên lót'],
@@ -663,20 +675,15 @@ class UploadStudentExcel(APIView):
                     ACADEMIC_LEVEL_TYPE_ID=academic_level_instance,
                 )
                 student_instance.save()
-            except learning_status_type.DoesNotExist:
-                return Response({"error": f"Learning status type {row['Trạng thái học tập']} does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-            except academic_level_type.DoesNotExist:
-                return Response({"error": f"Academic level type {row['Bậc đào tạo']} does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-            except Exception as e:
-                return Response({"error": f"Error saving student: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
-            except IntegrityError as e:
+            except IntegrityError:
                 return Response({"error": "Duplicate student record or integrity error"}, status=status.HTTP_400_BAD_REQUEST)
             except ValidationError as e:
                 errors = dict(e)
                 return Response({"error": errors}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({"error": f"Error saving student: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
         
         return Response({"success": "Students imported successfully"}, status=status.HTTP_201_CREATED)
-
 
 
 ######### import diploma excel ###########
