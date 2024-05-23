@@ -15,6 +15,7 @@ from django.shortcuts import render
 from .forms import ExcelUploadForm
 import pandas as pd
 from django.db import IntegrityError
+from django.db import transaction
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import api_view
 from .models  import *
@@ -347,9 +348,12 @@ class DegreeList(APIView):
             serializer = DegreeSerializer(degree_list, many=True)
             return Response({"data": serializer.data,"message":"Trả All" , "errCode": "0"})
     def post(self, request, format=None):
+        degree_item = degree.objects.filter(DEGREE_NAME=request.data['DEGREE_NAME'])
+        if degree_item is not None:
+            return Response({"Error":"Tên ngành đã tồn tại!! Vui lòng xem lại", "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
         serializer = DegreeSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save()   
             return Response({"data": serializer.data, "message": "Tạo mới thành công","errCode":"0"}, status=status.HTTP_201_CREATED)
         return Response({"Error":serializer.errors, "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -420,6 +424,9 @@ class AcademicProgramList(APIView):
             return Response({"data": serializer.data,"message":"Trả all !!", "errCode": "0"})
     
     def post(self, request, format=None):
+        academic_program_item = academic_program.objects.filter(ACADEMIC_PROGRAM_NAME=request.data['ACADEMIC_PROGRAM_NAME'])
+        if academic_program_item is not None:
+            return Response({"Error":"Tên ngành đã tồn tại!! Vui lòng xem lại", "errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
         serializer = PostAcademicProgramSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -621,43 +628,46 @@ class UploadStudentExcel(APIView):
         # Kiểm tra xem tệp có tồn tại trong request hay không
         if 'file' not in request.FILES:
             return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
-
         # Lấy tệp từ request
         excel_file = request.FILES['file']
-        
         if not excel_file.name.endswith('.xlsx'):
             return Response({"error": "File is not an Excel file"}, status=status.HTTP_400_BAD_REQUEST)
-        
         # Đọc tệp Excel
         try:
             df = pd.read_excel(excel_file)
         except Exception as e:
             return Response({"error": f"Error reading Excel file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
-
         # Duyệt qua từng hàng của dataframe
-        for _, row in df.iterrows():
+        errors = []
+        valid_data = []
+
+        # Kiểm tra tất cả các dòng
+        for index, row in df.iterrows():
             try:
                 # Lấy STUDENT_ID_NUMBER từ hàng
                 student_id_number = row['Mã Sinh Viên']
                 
                 # Kiểm tra xem STUDENT_ID_NUMBER có tồn tại trong cơ sở dữ liệu không
                 if student.objects.filter(STUDENT_ID_NUMBER=student_id_number).exists():
-                    return Response({"error": f"Sinh viên có mã số '{student_id_number}' đã tồn tại"}, status=status.HTTP_400_BAD_REQUEST)
+                    errors.append({"row": index, "error": f"Sinh viên có mã số '{student_id_number}' đã tồn tại"})
+                    continue
 
                 # Chuyển đổi giới tính
                 gender = True if row['Giới tính'] == 'Nam' else False
 
                 # Tìm kiếm instance cho các ForeignKey
                 learning_status_instance = learning_status_type.objects.filter(LEARNING_STATUS_TYPE_NAME=row['Trạng thái học tập']).first()
-                if not learning_status_instance:
-                    return Response({"error": f"Learning status type '{row['Trạng thái học tập']}' does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+                if learning_status_instance is None:
+                    errors.append({"row": index, "error": f"Learning status type '{row['Trạng thái học tập']}' không tồn tại"})
+                    continue
 
                 academic_level_instance = academic_level_type.objects.filter(ACADEMIC_LEVEL_TYPE_NAME=row['Bậc đào tạo']).first()
-                if not academic_level_instance:
-                    return Response({"error": f"Academic level type '{row['Bậc đào tạo']}' does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+                if academic_level_instance is None:
+                    errors.append({"row": index, "error": f"Academic level type '{row['Bậc đào tạo']}' không tồn tại"})
+                    continue
 
-                # Tạo và lưu instance của student
-                student_instance = student(
+                # Chuẩn bị dữ liệu hợp lệ
+                valid_data.append(student(
                     STUDENT_ID_NUMBER=student_id_number,
                     LAST_NAME=row['Họ'],
                     FIRST_NAME=row['Tên'],
@@ -673,16 +683,24 @@ class UploadStudentExcel(APIView):
                     COMMENTS=row['Mô tả'],
                     LEARNING_STATUS_TYPE_ID=learning_status_instance,
                     ACADEMIC_LEVEL_TYPE_ID=academic_level_instance,
-                )
-                student_instance.save()
-            except IntegrityError:
-                return Response({"error": "Duplicate student record or integrity error"}, status=status.HTTP_400_BAD_REQUEST)
+                ))
+
             except ValidationError as e:
-                errors = dict(e)
-                return Response({"error": errors}, status=status.HTTP_400_BAD_REQUEST)
+                errors.append({"row": index, "error": dict(e)})
             except Exception as e:
-                return Response({"error": f"Error saving student: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
-        
+                errors.append({"row": index, "error": str(e)})
+        # Nếu có lỗi, trả về các lỗi này
+        if errors:
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
+        # Nếu không có lỗi, thêm tất cả dữ liệu hợp lệ vào cơ sở dữ liệu
+        try:
+            with transaction.atomic():
+                for student_instance in valid_data:
+                    student_instance.save()
+        except IntegrityError:
+            return Response({"error": "Duplicate student record or integrity error"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": f"Error saving student: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"success": "Students imported successfully"}, status=status.HTTP_201_CREATED)
 
 
@@ -694,28 +712,37 @@ class UploadDiplomaExcel(APIView):
         # Kiểm tra xem tệp có tồn tại trong request hay không
         if 'file' not in request.FILES:
             return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
-
         # Lấy tệp từ request
         excel_file = request.FILES['file']
-        
         if not excel_file.name.endswith('.xlsx'):
             return Response({"error": "File is not an Excel file"}, status=status.HTTP_400_BAD_REQUEST)
-        
         # Đọc tệp Excel
         try:
             df = pd.read_excel(excel_file)
         except Exception as e:
             return Response({"error": f"Error reading Excel file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        for _, row in df.iterrows():
-            try:         
+        errors = []
+        valid_data = []
+        processed_student_ids = set()
+        # Kiểm tra tất cả các dòng
+        for index, row in df.iterrows():
+            try:
                 student_instance = student.objects.get(STUDENT_ID_NUMBER=row['Mã sinh viên'])
-                academic_program_instance = academic_program.objects.get(ACADEMIC_PROGRAM_NAME=row['Chuyên ngành đào tạo']) 
+                academic_program_instance = academic_program.objects.get(ACADEMIC_PROGRAM_NAME=row['Chuyên ngành đào tạo'])
 
+                if diploma_management_profile.objects.filter(STUDENT_ID_NUMBER=row['Mã sinh viên']).exists():
+                    errors.append({"row": index, "error": f"Student ID '{row['Mã sinh viên']}' đã tồn tại trong hồ sơ bằng"})
+                    continue
+                
+                if student_instance.STUDENT_ID_NUMBER in processed_student_ids:
+                    errors.append({"row": index, "error": f"Student ID '{row['Mã sinh viên']}' đã tồn tại trong dữ liệu đầu vào"})
+                    continue
+                processed_student_ids.add(student_instance.STUDENT_ID_NUMBER)
+                
                 # Lấy user từ request (người gửi request)
                 user = request.user
-            
-                diploma = diploma_management_profile(
+                # Chuẩn bị dữ liệu hợp lệ
+                valid_data.append(diploma_management_profile(
                     STUDENT_ID_NUMBER=student_instance,
                     ACADEMIC_PROGRAM_ID=academic_program_instance,
                     GRADUATION_YEAR=row['Năm tốt nghiệp'],
@@ -726,22 +753,29 @@ class UploadDiplomaExcel(APIView):
                     DATE_OF_DECISION_ANNOUNCEMENT=pd.to_datetime(row['Ngày tốt nghiệp']).date(),
                     COMMENT=row['Ghi chú'],
                     user=user,
-                    APPORVED=True
-                )
-                diploma.save()  # Lưu diploma vào cơ sở dữ liệu
+                    APPROVED=True
+                ))
             except student.DoesNotExist:
-                return Response({"error": f"Student ID {row['Mã sinh viên']} does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+                errors.append({"row": index, "error": f"Student ID {row['Mã sinh viên']} không tồn tại"})
             except academic_program.DoesNotExist:
-                return Response({"error": f"Academic program '{row['Chuyên ngành đào tạo']}' does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-            except IntegrityError as e:
-                if 'duplicate entry' in str(e).lower():
-                    return Response({"error": f"Duplicate entry for student ID {row['Mã sinh viên']}"}, status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    return Response({"error": f"Integrity error: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+                errors.append({"row": index, "error": f"Academic program '{row['Chuyên ngành đào tạo']}' không tồn tại"})
             except ValidationError as e:
-                return Response({"error": f"Validation error: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+                errors.append({"row": index, "error": f"Validation error: {e}"})
             except Exception as e:
-                return Response({"error": f"Error saving diploma: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
-            
-        
-        return Response({"success": "Diplomas imported successfully"}, status=status.HTTP_201_CREATED)
+                errors.append({"row": index, "error": f"Error processing row: {str(e)}"})
+
+        # Nếu có lỗi, trả về các lỗi này
+        if errors:
+            return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Nếu không có lỗi, thêm tất cả dữ liệu hợp lệ vào cơ sở dữ liệu
+        try:
+            with transaction.atomic():
+                for diploma in valid_data:
+                    diploma.save()
+        except IntegrityError as e:
+            return Response({"error": f"Integrity error: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": f"Error saving diploma: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"success": "Thêm hồ sơ bằng thành công "}, status=status.HTTP_201_CREATED)
