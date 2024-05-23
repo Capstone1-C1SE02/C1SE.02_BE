@@ -381,16 +381,16 @@ class DegreeDetail(APIView):
 @permission_classes([IsAuthenticated])
 class SearchDegree(APIView):
     def post(self, request, format=None):
-        # Get the 'name' query parameter from the request
-        student_id= request.query_params.get('studentID', None)
+        # Get the 'degree name' query parameter from the request
+        degree_name= request.query_params.get('degreename', None)
 
-        if student_id:
+        if degree_name:
             # Filter students by name (case-insensitive)
-            student_information = student.objects.get(STUDENT_ID_NUMBER=student_id)
-            serializer = GetStudentSerializer(student_information, many=False)
+            degree_information = degree.objects.get(DEGREE_NAME=degree_name)
+            serializer = DegreeSerializer(degree_information, many=False)
             return Response({"data": serializer.data, "Message": "Lấy dữ liệu thành công!!", "errCode": "0"}, status=status.HTTP_200_OK)
         else:
-            return Response({"Message": "Vui lòng cung cấp mã sinh viên để tìm kiếm", "errCode": "1"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"Message": "Vui lòng cung cấp tên ngành để tìm kiếm", "errCode": "1"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -455,15 +455,15 @@ class AcademicProgramDetail(APIView):
 class SearchAcademicProgram(APIView):
     def post(self, request, format=None):
         # Get the 'name' query parameter from the request
-        student_id= request.query_params.get('studentID', None)
+        academic_program_name= request.query_params.get('AcademicProgramName', None)
 
-        if student_id:
+        if academic_program_name:
             # Filter students by name (case-insensitive)
-            student_information = student.objects.get(STUDENT_ID_NUMBER=student_id)
-            serializer = GetStudentSerializer(student_information, many=False)
+            academic_program_information = academic_program.objects.get(ACADEMIC_PROGRAM_NAME=academic_program_name)
+            serializer = GetAcademicProgramSerializer(academic_program_information, many=False)
             return Response({"data": serializer.data, "Message": "Lấy dữ liệu thành công!!", "errCode": "0"}, status=status.HTTP_200_OK)
         else:
-            return Response({"Message": "Vui lòng cung cấp mã sinh viên để tìm kiếm", "errCode": "1"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"Message": "Vui lòng cung cấp tên chuyên ngành để tìm kiếm", "errCode": "1"}, status=status.HTTP_400_BAD_REQUEST)
 
 ######----------------------------------------------------------------------------------------------#####   
 
