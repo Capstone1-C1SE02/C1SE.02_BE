@@ -59,6 +59,7 @@ urlpatterns = [
     path('search/student', SearchStudent.as_view()),
     path('search/degree', SearchDegree.as_view()),
     path('search/academicprogram', SearchAcademicProgram.as_view()),
+    path('search/curriculum', SearchCurriculum.as_view()),
 
 
     ### Excel Upload URLs ##############

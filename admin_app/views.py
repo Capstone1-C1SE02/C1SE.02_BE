@@ -175,10 +175,15 @@ class AcademicIntakeSessionList(APIView):
     pagination_class = MyPagination
     def get(self, request, format=None):
         academicIntakeSession = academic_intake_session.objects.all()
-        paginator = self.pagination_class()  # Khởi tạo paginator
-        result_page = paginator.paginate_queryset(academicIntakeSession, request)
-        serializer = AcademicIntakeSessionSerializer(result_page, many=True)
-        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
+        if 'page' in request.query_params:
+            paginator = self.pagination_class()  # Khởi tạo paginator
+            result_page = paginator.paginate_queryset(academicIntakeSession, request)
+            serializer = AcademicIntakeSessionSerializer(result_page, many=True)
+            return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
+        else:
+            # If 'page' is not in request, return all results
+            serializer = AcademicIntakeSessionSerializer(academicIntakeSession, many=True)
+            return Response({"data":serializer.data, "errCode":"0"})
     def post(self, request, format=None):
         serializer = AcademicIntakeSessionSerializer(data=request.data)
         if serializer.is_valid():
@@ -222,10 +227,15 @@ class CurriculumList(APIView):
     pagination_class = MyPagination
     def get(self, request, format=None):
         curriculum_temp = curriculum.objects.all()
-        paginator = self.pagination_class()  # Khởi tạo paginator
-        curriculum_page = paginator.paginate_queryset(curriculum_temp, request)
-        serializer = GetCurriculumSerializer(curriculum_page, many=True)
-        return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
+        if 'page' in request.query_params:
+            paginator = self.pagination_class()  # Khởi tạo paginator
+            curriculum_page = paginator.paginate_queryset(curriculum_temp, request)
+            serializer = GetCurriculumSerializer(curriculum_page, many=True)
+            return paginator.get_paginated_response({"data":serializer.data, "errCode":"0"})
+        else:
+            # If 'page' is not in request, return all results
+            serializer = GetCurriculumSerializer(curriculum_temp, many=True)
+            return Response({"data":serializer.data, "errCode":"0"})
     def post(self, request, format=None):
         serializer = PostCurriculumSerializer(data=request.data)
         if serializer.is_valid():
@@ -260,6 +270,44 @@ class CurriculumDetail(APIView):
         curriculum_temp.delete()
         return Response({"message": "Xóa thành công","errCode":"0"}, status=status.HTTP_204_NO_CONTENT)
     
+## Search Curriculum API ##
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class SearchCurriculum(APIView):
+    def post(self, request, format=None):
+        # Get the 'academicprogramname' query parameter from the request
+        academic_program_name = request.query_params.get('academicprogramname', None)
+        if academic_program_name is None:
+            return Response(
+                {"Message": "Vui lòng cung cấp tên chương trình đào tạo để tìm kiếm", "errCode": "-1"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            academic_program_ob = academic_program.objects.get(ACADEMIC_PROGRAM_NAME=academic_program_name)
+            academic_program_id = academic_program_ob.ACADEMIC_PROGRAM_ID
+            curriculum_information = curriculum.objects.filter(ACADEMIC_PROGRAM_ID=academic_program_id)
+            if curriculum_information.exists():
+                serializer = GetCurriculumSerializer(curriculum_information, many=True)
+                return Response(
+                    {"data": serializer.data, "Message": "Lấy dữ liệu thành công!!", "errCode": "0"}, 
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"Message": "Không tìm thấy chương trình đào tạo phù hợp!!", "errCode": "-1"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        except academic_program.DoesNotExist:
+            return Response(
+                {"Message": "Không tìm thấy chương trình đào tạo phù hợp!!", "errCode": "-1"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"Message": "Đã xảy ra lỗi khi tìm kiếm chương trình đào tạo", "errCode": "-1", "error": str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 
 
 ####### Student API ########
@@ -489,9 +537,9 @@ class SearchAcademicProgram(APIView):
                     serializer = GetAcademicProgramSerializer(academic_program_information, many=True)
                     return Response({"data": serializer.data, "Message": "Lấy dữ liệu thành công!!", "errCode": "0"}, status=status.HTTP_200_OK)
                 else:
-                    return Response({"Message": "Không tìm thấy chương trình học phù hợp!!", "errCode": "-1"}, status=status.HTTP_404_NOT_FOUND)
+                    return Response({"Message": "Không tìm thấy chuyên ngành phù hợp!!", "errCode": "-1"}, status=status.HTTP_404_NOT_FOUND)
             except Exception as e:
-                return Response({"Message": "Đã xảy ra lỗi khi tìm kiếm chương trình học", "errCode": "-1", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response({"Message": "Đã xảy ra lỗi khi tìm kiếm chuyên ngành", "errCode": "-1", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response({"Message": "Vui lòng cung cấp tên chuyên ngành để tìm kiếm", "errCode": "-1"}, status=status.HTTP_400_BAD_REQUEST)
 
