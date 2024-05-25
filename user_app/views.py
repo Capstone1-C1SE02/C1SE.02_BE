@@ -169,8 +169,8 @@ def extract_regions_of_interest(image):
     bottom_left_x_start = int(21* width / 40)
     bottom_left_y_start = int(3 * height / 4)
 
-    bottom_left_x_end = int(3 * width / 4)
-    bottom_left_y_end = height
+    bottom_left_x_end = int(25* width / 32)
+    bottom_left_y_end = int(19 * height / 20)
     bottom_left = image[bottom_left_y_start:bottom_left_y_end, bottom_left_x_start:bottom_left_x_end]
     return mid_right, bottom_left
 
@@ -211,8 +211,7 @@ def extract_certificate_number(text):
     # print("lines" + str(lines))
     for line in lines:
         # print("line: "+line)
-        if "Số hiệu" in line or "sốhiệu" in line or "Sốhiệy" in line or "số"in line  or "hiệu" in line: 
-            print("line: "+line)
+        if "Số hiệu" in line or "sốhiệu" in line or "Sốhiệy" in line or "số hiệu"in line  or "số" in line or "hiệu" in line: 
             if re.search(r'\b(\d+)\b', line):
                 certificate_number = re.search(r'\b(\d+)\b', line).group(1)
                 return certificate_number
@@ -222,19 +221,19 @@ def get_certificate_number(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     gray_image = cv2.GaussianBlur(gray, (5, 5), 0)
     text = pytesseract.image_to_string(gray_image, lang='vie')
-    print(text)
+    # print(text)
     certificate_number = extract_certificate_number(text)
-    boxes = pytesseract.image_to_data(gray_image)
-    for x, b in enumerate(boxes.splitlines()):
-        if x != 0:
-            b = b.split()
-            if len(b) == 12:
-                x, y, w, h = int(b[6]), int(b[7]), int(b[8]), int(b[9])
-                cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
-    # Hiển thị ảnh với các bounding boxes
-    cv2.imshow('Result', image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # boxes = pytesseract.image_to_data(gray_image)
+    # for x, b in enumerate(boxes.splitlines()):
+    #     if x != 0:
+    #         b = b.split()
+    #         if len(b) == 12:
+    #             x, y, w, h = int(b[6]), int(b[7]), int(b[8]), int(b[9])
+    #             cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
+    # # Hiển thị ảnh với các bounding boxes
+    # cv2.imshow('Result', image)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
     return certificate_number
 
 ###### NUMBER IN DEGREE
@@ -242,6 +241,8 @@ def extract_number_in_degree(text):
     # Tìm dòng chứa từ khóa "Sốvào sổ cấp bằng:"
     lines = text.split('\n')
     for line in lines:
+        # print("line: "+line)
+        # print("Số vào sổ cấp bằng" in line or "Số vào sổ " in line  or "sổ cấp bằng" in line or "cấp bằng" in line)
         if "Số vào sổ cấp bằng" in line or "Số vào sổ " in line  or "sổ cấp bằng" in line or "cấp bằng" in line:
             parts = line.split(' ')
             if len(parts) > 1:
@@ -280,11 +281,11 @@ class InformationRetrievalthroughImageAPIView(APIView):
             student_name = get_student_name(mid_right)
             certificate_number = get_certificate_number(bottom_left)
             number_in_degree = get_number_in_degree(bottom_left)
-            print(student_name)
-            print(certificate_number)
-            print(number_in_degree)
+            # print(student_name)
+            # print(certificate_number)
+            # print(number_in_degree)
             ######### kiểm tra xem có extract được text phù hợp không 
-            if student_name is None or certificate_number is None or number_in_degree is None:
+            if certificate_number is None or number_in_degree is None:
                 return Response({"message": "Lỗi: Vui lòng gửi lại ảnh gồm toàn bộ hình ảnh của văn bằng và chất lượng tốt hơn!!!!","errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
             
             ######## tách student name thành first_name, last_name và middle_name
