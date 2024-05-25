@@ -17,34 +17,34 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     ### Status Type  URLs##############
-    path('academicleveltype', AcademicLevelTypeList.as_view()),
+    path('academicleveltype/', AcademicLevelTypeList.as_view()),
     path('academicleveltype/<int:pk>', AcademicIntakeSessionDetail.as_view()),
-    path('learningstatustype', LearningStatusTypeList.as_view()),
+    path('learningstatustype/', LearningStatusTypeList.as_view()),
     path('learningstatustype/<int:pk>', LearningStatusTypeDetail.as_view()),
 
     ### Academic Intake Session URLs##############
-    path('academicintakesession', AcademicIntakeSessionList.as_view(),name='academic-intake-session-list'),
+    path('academicintakesession/', AcademicIntakeSessionList.as_view(),name='academic-intake-session-list'),
     path('academicintakesession/<int:pk>', AcademicIntakeSessionDetail.as_view(),name='academic-intake-session-id'),
     
 
     ### Curriculum URLs##############
-    path('curriculum', CurriculumList.as_view(),name='curriculum-list'),
+    path('curriculum/', CurriculumList.as_view(),name='curriculum-list'),
     path('curriculum/<int:pk>', CurriculumDetail.as_view(),name='curriculum-id'),
 
     #### Student URLs##############
-    path('student', StudentList.as_view(),name='student-list'),
+    path('student/', StudentList.as_view(),name='student-list'),
     path('student/<int:pk>', StudentDetail.as_view(),name='student-id'),
 
     ### Degree URLs##############
-    path('degree', DegreeList.as_view(), name='degree-list'),
+    path('degree/', DegreeList.as_view(), name='degree-list'),
     path('degree/<int:pk>', DegreeDetail.as_view(),name='degree-id'),
 
     ### Academic Program URLs##############
-    path('academicprogram', AcademicProgramList.as_view(),name='academic-program-list'),
+    path('academicprogram/', AcademicProgramList.as_view(),name='academic-program-list'),
     path('academicprogram/<int:pk>', AcademicProgramDetail.as_view(),name='academic-program-id'),
 
     ### Academic Intake Session Academic Program Curriculum URLs##############
-    path('academicintakesessionacademicprogramcurriculum', AcademicIntakeSession_AcademicProgram_Curriculum_List.as_view(),name='AISAPC-list'),
+    path('academicintakesessionacademicprogramcurriculum/', AcademicIntakeSession_AcademicProgram_Curriculum_List.as_view(),name='AISAPC-list'),
     path('academicintakesessionacademicprogramcurriculum/<int:pk>', AcademicIntakeSession_AcademicProgram_Curriculum_Detail.as_view(),name='AISAPC-id'),
 
     ### Student Academic Intake Session Academic Program URLs##############
@@ -52,7 +52,7 @@ urlpatterns = [
     path('studentacademicintakesessionacademicprogram/<int:pk>', Student_AcademicIntakeSession_AcademicProgram_Detail.as_view(),name='SAISAP-id'),
 
     ### Diploma Management Profile URLs ############## 
-    path('diplomamanagementprofile', DiplomaManagementProfileList.as_view(),name='Diploma-list'),
+    path('diplomamanagementprofile/', DiplomaManagementProfileList.as_view(),name='Diploma-list'),
     path('diplomamanagementprofile/<int:pk>', DiplomaManagementProfileDetail.as_view(),name='Diploma-id'),
 
     ### Search URLs ##############

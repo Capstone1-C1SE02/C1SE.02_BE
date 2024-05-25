@@ -168,7 +168,7 @@ class LearningStatusTypeDetail(APIView):
 ##########################################
 ################## API ###################
 ##########################################
-####### Academic Intake #Session API #######
+####### Academic Intake Session API #######
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 class AcademicIntakeSessionList(APIView):
@@ -646,6 +646,7 @@ class UploadStudentExcel(APIView):
         # Kiểm tra xem tệp có tồn tại trong request hay không
         if 'file' not in request.FILES:
             return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
+        
         # Lấy tệp từ request
         excel_file = request.FILES['file']
         if not excel_file.name.endswith('.xlsx'):
@@ -656,8 +657,10 @@ class UploadStudentExcel(APIView):
         except Exception as e:
             return Response({"error": f"Error reading Excel file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
         # Duyệt qua từng hàng của dataframe
+        
         errors = []
         valid_data = []
+        processed_student_ids = set()
 
         # Kiểm tra tất cả các dòng
         for index, row in df.iterrows():
@@ -667,7 +670,12 @@ class UploadStudentExcel(APIView):
                 
                 # Kiểm tra xem STUDENT_ID_NUMBER có tồn tại trong cơ sở dữ liệu không
                 if student.objects.filter(STUDENT_ID_NUMBER=student_id_number).exists():
-                    errors.append({"row": index, "error": f"Sinh viên có mã số '{student_id_number}' đã tồn tại"})
+                    errors.append({"row": index, "error": f"Sinh viên có mã số '{student_id_number}' đã tồn tại trong database!"})
+                    continue
+
+                # Kiểm tra xem STUDENT_ID_NUMBER đã được có trong valid_data hay không
+                if student_id_number in processed_student_ids:
+                    errors.append({"row": index, "error": f"Student ID '{student_id_number}' đã tồn tại trong dữ liệu đầu vào"})
                     continue
 
                 # Chuyển đổi giới tính
@@ -683,6 +691,8 @@ class UploadStudentExcel(APIView):
                 if academic_level_instance is None:
                     errors.append({"row": index, "error": f"Academic level type '{row['Bậc đào tạo']}' không tồn tại"})
                     continue
+
+                processed_student_ids.add(student_id_number)
 
                 # Chuẩn bị dữ liệu hợp lệ
                 valid_data.append(student(
@@ -702,11 +712,12 @@ class UploadStudentExcel(APIView):
                     LEARNING_STATUS_TYPE_ID=learning_status_instance,
                     ACADEMIC_LEVEL_TYPE_ID=academic_level_instance,
                 ))
-
+                
             except ValidationError as e:
                 errors.append({"row": index, "error": dict(e)})
             except Exception as e:
                 errors.append({"row": index, "error": str(e)})
+
         # Nếu có lỗi, trả về các lỗi này
         if errors:
             return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
@@ -739,6 +750,8 @@ class UploadDiplomaExcel(APIView):
             df = pd.read_excel(excel_file)
         except Exception as e:
             return Response({"error": f"Error reading Excel file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
         errors = []
         valid_data = []
         processed_student_ids = set()

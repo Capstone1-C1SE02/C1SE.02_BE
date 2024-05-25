@@ -11,7 +11,7 @@ class degree(models.Model):
     DEGREE_NAME = models.CharField(max_length=50,null= False)
     DEGREE_CODE = models.CharField(max_length=20,null= False)
     DEGREE_STATUS = models.BooleanField(null= False)
-    DESCRIPTION = models.CharField(max_length=500,default=None,null= True)
+    DESCRIPTION = models.CharField(max_length=500,default=None,null= True,blank=True)
 
 class academic_level_type(models.Model):
     ACADEMIC_LEVEL_TYPE_ID = models.AutoField(primary_key=True)
@@ -23,14 +23,14 @@ class academic_program(models.Model):
     ACADEMIC_PROGRAM_NAME = models.CharField(max_length=50,null= False)
     MODE_OF_STUDY = models.CharField(max_length=50,null= False)
     DEGREE_DURATION = models.CharField(max_length=50,null= False)
-    DESCRIPTION = models.CharField(max_length=500,null= True, default=None)
+    DESCRIPTION = models.CharField(max_length=500,null= True, default=None,blank=True)
     ACADEMIC_LEVEL_TYPE_ID = models.ForeignKey(academic_level_type, on_delete = models.CASCADE, to_field = 'ACADEMIC_LEVEL_TYPE_ID')
     DEGREE_ID = models.ForeignKey(degree, on_delete = models.CASCADE, to_field = 'DEGREE_ID')
 
 class curriculum(models.Model):
     CURRICULUM_ID = models.AutoField(primary_key=True)
     CURRICULUM_NAME = models.CharField(max_length=50,null= False)
-    DESCRIPTION = models.CharField(max_length=500,null= True, default=None)
+    DESCRIPTION = models.CharField(max_length=500,null= True, default=None,blank=True)
     CURRICULUM_STATUS_NAME = models.BooleanField(default=True)
     ACADEMIC_PROGRAM_ID = models.ForeignKey(academic_program, on_delete = models.CASCADE, to_field = 'ACADEMIC_PROGRAM_ID')
 
@@ -61,7 +61,7 @@ class student(models.Model):
     NATIONALITY = models.CharField(max_length=50,null= False)
     PHONE_NUMBER = models.CharField(max_length=50,null = True) 
     EMAIL = models.CharField(max_length=50,null = True)
-    COMMENTS = models.CharField(max_length=500,null= True, default=None)
+    COMMENTS = models.CharField(max_length=500,null= True, default=None,blank=True)
     LEARNING_STATUS_TYPE_ID = models.ForeignKey(learning_status_type, on_delete = models.CASCADE, to_field = 'LEARNING_STATUS_TYPE_ID')
     ACADEMIC_LEVEL_TYPE_ID = models.ForeignKey(academic_level_type, on_delete = models.CASCADE, to_field = 'ACADEMIC_LEVEL_TYPE_ID')
 
@@ -86,7 +86,7 @@ class diploma_management_profile(models.Model):
     CERTIFICATE_NUMBER = models.CharField(max_length=50,null= False)
     NUMBER_ENTERED_INTO_THE_DEGREE_TRACKING_BOOK = models.CharField(max_length=50,null= False)
     DATE_OF_DECISION_ANNOUNCEMENT = models.DateField(null= False)
-    COMMENT = models.CharField(max_length=500,null= True, default=None)
+    COMMENT = models.CharField(max_length=500,null= True, default=None,blank=True)
     DATE_UPDATED = models.DateField(null= False,auto_now=True)
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     APPROVED = models.BooleanField(default=False)
