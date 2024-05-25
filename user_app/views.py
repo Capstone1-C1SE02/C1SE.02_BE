@@ -5,13 +5,16 @@ from captcha.models import CaptchaStore
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
 
+## import for image processing
 from PIL import Image
 from io import BytesIO
-import cv2
-from django.core.files.uploadedfile import InMemoryUploadedFile
 import numpy as np
 import pytesseract
-
+import re
+import cv2
+## import để xử lý phần lấy file ở request
+from django.core.files.uploadedfile import InMemoryUploadedFile
+## import model and serializers
 from admin_app.models import *
 from .serializers import *
 
@@ -93,6 +96,8 @@ class InformationRetrievalthroughTextAPIView(APIView):
 ####################################################################
 ###################### Image Processing ############################
 ####################################################################
+
+#### Các hàm Pre-Process    
 #### Cân Bằng Trắng (White Balancing):
 def white_balance(image):
     result = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
@@ -104,6 +109,22 @@ def white_balance(image):
 #### Lọc Gaussian (Gaussian Blurring)
 def gaussian_blur(image):
     return cv2.GaussianBlur(image, (5, 5), 0)
+def rotate_image(image):
+    # Chuyển đổi sang ảnh thang độ xám
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # Sử dụng biến đổi Hough để phát hiện các đường thẳng
+    lines = cv2.HoughLinesP(gray, 1, np.pi/180, 100, minLineLength=100, maxLineGap=10)
+    # Tính góc quay
+    angle = 0.0
+    for x1, y1, x2, y2 in lines[:, 0]:
+        angle += np.arctan2(y2 - y1, x2 - x1)
+    angle /= len(lines)
+    # Xoay ảnh
+    rows, cols = image.shape[:2]
+    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle * 180 / np.pi, 1)
+    rotated_image = cv2.warpAffine(image, M, (cols, rows))
+    # Trả về ảnh đã xoay
+    return rotated_image
 
 ##### Resize for Student Name
 def resize_student_name_image_for_tesseract(image):
@@ -145,11 +166,11 @@ def extract_regions_of_interest(image):
     mid_right = image[mid_right_y_start:mid_right_y_end, mid_right_x_start:mid_right_x_end]
 
     # Phần dưới góc trái của phần bên phải chiếm 1/4 chiều rộng bên phải và 1/4 chiều cao dưới cùng
-    bottom_left_x_start = int(11* width / 20)
+    bottom_left_x_start = int(21* width / 40)
     bottom_left_y_start = int(3 * height / 4)
 
-    bottom_left_x_end = int(3 * width / 4)
-    bottom_left_y_end = height
+    bottom_left_x_end = int(25* width / 32)
+    bottom_left_y_end = int(19 * height / 20)
     bottom_left = image[bottom_left_y_start:bottom_left_y_end, bottom_left_x_start:bottom_left_x_end]
     return mid_right, bottom_left
 
@@ -187,20 +208,22 @@ def get_student_name(image):
 def extract_certificate_number(text):
     # Tìm dòng chứa từ khóa "sốhiệu:"
     lines = text.split('\n')
-    if len(lines) >= 1:
-        for line in lines:
-            parts = line.split(' ')
-            if len(parts) > 1:
-                certificate_number = parts[1]
+    # print("lines" + str(lines))
+    for line in lines:
+        # print("line: "+line)
+        if "Số hiệu" in line or "sốhiệu" in line or "Sốhiệy" in line or "số hiệu"in line  or "số" in line or "hiệu" in line: 
+            if re.search(r'\b(\d+)\b', line):
+                certificate_number = re.search(r'\b(\d+)\b', line).group(1)
                 return certificate_number
     return None
 def get_certificate_number(image):
     image = resize_number_image_for_tesseract(image) 
-    # white = white_balance(image)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    text = pytesseract.image_to_string(gray, lang='vie')
+    gray_image = cv2.GaussianBlur(gray, (5, 5), 0)
+    text = pytesseract.image_to_string(gray_image, lang='vie')
+    # print(text)
     certificate_number = extract_certificate_number(text)
-    # boxes = pytesseract.image_to_data(gray)
+    # boxes = pytesseract.image_to_data(gray_image)
     # for x, b in enumerate(boxes.splitlines()):
     #     if x != 0:
     #         b = b.split()
@@ -218,14 +241,16 @@ def extract_number_in_degree(text):
     # Tìm dòng chứa từ khóa "Sốvào sổ cấp bằng:"
     lines = text.split('\n')
     for line in lines:
-        if "Số vào sổ cấp bằng" in line:
+        # print("line: "+line)
+        # print("Số vào sổ cấp bằng" in line or "Số vào sổ " in line  or "sổ cấp bằng" in line or "cấp bằng" in line)
+        if "Số vào sổ cấp bằng" in line or "Số vào sổ " in line  or "sổ cấp bằng" in line or "cấp bằng" in line:
             parts = line.split(' ')
             if len(parts) > 1:
                 number_in_degree = parts[-1]
                 return number_in_degree
     return None
 def get_number_in_degree(image):
-    image = resize_number_image_for_tesseract(image)
+    image = resize_number_image_for_tesseract(image)    
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     text = pytesseract.image_to_string(gray, lang='vie')
     number_in_degree = extract_number_in_degree(text)
@@ -256,18 +281,19 @@ class InformationRetrievalthroughImageAPIView(APIView):
             student_name = get_student_name(mid_right)
             certificate_number = get_certificate_number(bottom_left)
             number_in_degree = get_number_in_degree(bottom_left)
-            print(student_name, certificate_number, number_in_degree)
-
+            # print(student_name)
+            # print(certificate_number)
+            # print(number_in_degree)
             ######### kiểm tra xem có extract được text phù hợp không 
-            if student_name is None or certificate_number is None or number_in_degree is None:
+            if certificate_number is None or number_in_degree is None:
                 return Response({"message": "Lỗi: Vui lòng gửi lại ảnh gồm toàn bộ hình ảnh của văn bằng và chất lượng tốt hơn!!!!","errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
             
             ######## tách student name thành first_name, last_name và middle_name
-            parts = student_name.split()
-            if len(parts) == 3:
-                last_name, middle_name, first_name  = parts
-            else:
-                return Response({'error': 'Invalid student name format. Please provide full name ',"errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
+            # parts = student_name.split()
+            # if len(parts) == 3:
+            #     last_name, middle_name, first_name  = parts
+            # else:
+            #     return Response({'error': 'Invalid student name format. Please provide full name ',"errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
             
             ###### phần lấy đối tượng và trả về kết quả cho client
             try:
