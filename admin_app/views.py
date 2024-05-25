@@ -322,9 +322,12 @@ class SearchStudent(APIView):
 
         if student_id:
             try:
-                student_information = student.objects.get(STUDENT_ID_NUMBER=student_id)
-                serializer = GetStudentSerializer(student_information, many=False)
-                return Response({"data": serializer.data, "Message": "Lấy dữ liệu thành công!!", "errCode": "0"}, status=status.HTTP_200_OK)
+                student_information = student.objects.filter(STUDENT_ID_NUMBER__startswith=student_id)
+                if student_information.exists():
+                    serializer = GetStudentSerializer(student_information, many=True)
+                    return Response({"data": serializer.data, "Message": "Lấy dữ liệu thành công!!", "errCode": "0"}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"Message": "Không tìm thấy sinh viên phù hợp!!", "errCode": "-1"}, status=status.HTTP_404_NOT_FOUND)
             except:
                 return Response({"Message": "Không tìm thấy sinh viên phù hợp!!", "errCode": "-1"}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -398,11 +401,14 @@ class SearchDegree(APIView):
         if degree_name:
             # Filter students by name (case-insensitive)
             try:
-                degree_information = degree.objects.get(DEGREE_NAME=degree_name)
-                serializer = DegreeSerializer(degree_information, many=False)
-                return Response({"data": serializer.data, "Message": "Lấy dữ liệu thành công!!", "errCode": "0"}, status=status.HTTP_200_OK)
-            except:
-                return Response({"Message": "Không tìm thấy tên ngành phù hợp!", "errCode": "-1"}, status=status.HTTP_400_BAD_REQUEST)  
+                degree_information = degree.objects.filter(DEGREE_NAME__icontains=degree_name)
+                if degree_information.exists():
+                    serializer = DegreeSerializer(degree_information, many=True)
+                    return Response({"data": serializer.data, "Message": "Lấy dữ liệu thành công!!", "errCode": "0"}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"Message": "Không tìm thấy tên ngành phù hợp!", "errCode": "-1"}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({"Message": "Đã xảy ra lỗi khi tìm kiếm ngành", "errCode": "-1", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response({"Message": "Vui lòng cung cấp tên ngành để tìm kiếm", "errCode": "-1"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -474,16 +480,18 @@ class AcademicProgramDetail(APIView):
 class SearchAcademicProgram(APIView):
     def post(self, request, format=None):
         # Get the 'name' query parameter from the request
-        academic_program_name= request.query_params.get('AcademicProgramName', None)
+        academic_program_name= request.query_params.get('academicprogramname', None)
 
         if academic_program_name:
             try:
-                academic_program_information = academic_program.objects.get(ACADEMIC_PROGRAM_NAME=academic_program_name)
-                serializer = GetAcademicProgramSerializer(academic_program_information, many=False)
-                return Response({"data": serializer.data, "Message": "Lấy dữ liệu thành công!!", "errCode": "0"}, status=status.HTTP_200_OK)
-            except:
-                return Response({"Message": "Không tìm thấy tên chuyên ngành phù hợp!", "errCode": "-1"}, status=status.HTTP_400_BAD_REQUEST)
-            
+                academic_program_information = academic_program.objects.filter(ACADEMIC_PROGRAM_NAME__startswith=academic_program_name)
+                if academic_program_information.exists():
+                    serializer = GetAcademicProgramSerializer(academic_program_information, many=True)
+                    return Response({"data": serializer.data, "Message": "Lấy dữ liệu thành công!!", "errCode": "0"}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"Message": "Không tìm thấy chương trình học phù hợp!!", "errCode": "-1"}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({"Message": "Đã xảy ra lỗi khi tìm kiếm chương trình học", "errCode": "-1", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response({"Message": "Vui lòng cung cấp tên chuyên ngành để tìm kiếm", "errCode": "-1"}, status=status.HTTP_400_BAD_REQUEST)
 

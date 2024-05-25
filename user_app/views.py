@@ -165,10 +165,10 @@ def extract_regions_of_interest(image):
     mid_right_y_end = int(2 * height / 3)
     mid_right = image[mid_right_y_start:mid_right_y_end, mid_right_x_start:mid_right_x_end]
 
+
     # Phần dưới góc trái của phần bên phải chiếm 1/4 chiều rộng bên phải và 1/4 chiều cao dưới cùng
     bottom_left_x_start = int(21* width / 40)
     bottom_left_y_start = int(3 * height / 4)
-
     bottom_left_x_end = int(25* width / 32)
     bottom_left_y_end = int(19 * height / 20)
     bottom_left = image[bottom_left_y_start:bottom_left_y_end, bottom_left_x_start:bottom_left_x_end]
@@ -281,9 +281,9 @@ class InformationRetrievalthroughImageAPIView(APIView):
             student_name = get_student_name(mid_right)
             certificate_number = get_certificate_number(bottom_left)
             number_in_degree = get_number_in_degree(bottom_left)
-            # print(student_name)
-            # print(certificate_number)
-            # print(number_in_degree)
+            print(student_name)
+            print(certificate_number)
+            print(number_in_degree)
             ######### kiểm tra xem có extract được text phù hợp không 
             if certificate_number is None or number_in_degree is None:
                 return Response({"message": "Lỗi: Vui lòng gửi lại ảnh gồm toàn bộ hình ảnh của văn bằng và chất lượng tốt hơn!!!!","errCode":"-1"}, status=status.HTTP_400_BAD_REQUEST)
@@ -309,7 +309,7 @@ class InformationRetrievalthroughImageAPIView(APIView):
             ## Nếu không có đối tượng nào hoặc có nhiều hơn một đối tượng thỏa mãn điều kiện, sẽ ném ra ngoại lệ
             except diploma_management_profile.DoesNotExist:
                     # Trả về thông báo lỗi nếu không tìm thấy đối tượng
-                return Response({"message": "Không tìm thấy hồ sơ phù hợp.","errCode":"0"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"message": "Không tìm thấy hồ sơ phù hợp.","errCode":"0"}, status=status.status.HTTP_200_OK)
             except Exception as e:
                     # Trả về thông báo lỗi chung nếu có lỗi xảy ra
                 return Response({"message": "Đã xảy ra lỗi khi xử lý yêu cầu.","errCode":"1"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
